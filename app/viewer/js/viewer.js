@@ -276,7 +276,7 @@ var viewer = viewer || {};
     this.volume.reslicing = this.reslice;
     this.volume.file = orderedFiles;
     this.volume.key = nodeObj.key;
-    // if  there is an list of HTML5 File objects then load the volume data
+    // if there is a list of HTML5 File objects then load the volume data here
     if (nodeObj.data.fileObjs && nodeObj.data.fileObjs.length) {
       var numFiles = 0;
       var filedata = [];
@@ -357,9 +357,29 @@ var viewer = viewer || {};
       xtkObj.file = nodeObj.data.url + '/' + nodeObj.data.files;
       xtkObj.key = nodeObj.key;
       this.geomModels.push(xtkObj);
-      this['vol3D'].add(xtkObj);
-      this['vol3D'].camera.position = [0, 0, 200];
-      this['vol3D'].render();
+
+      // if there is a list of HTML5 File objects then load the model data here
+      if (nodeObj.data.fileObjs && nodeObj.data.fileObjs.length) {
+        var self = this;
+        var fileObj = nodeObj.data.fileObjs[0];
+
+        function render() {
+          self['vol3D'].add(xtkObj);
+          self['vol3D'].camera.position = [0, 0, 200];
+          self['vol3D'].render();
+        }
+
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+          self.volume.filedata = reader.result;
+          render();
+        };
+        reader.readAsArrayBuffer(fileObj);
+
+      } else {
+        render();
+      }
+
     }
   }
 
