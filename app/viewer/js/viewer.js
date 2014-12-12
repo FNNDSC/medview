@@ -112,7 +112,6 @@ var viewer = viewer || {};
     this.onRight2DContDblClickListener = this.on2DContDblClick.bind(this, 'right');
     document.getElementsByClassName('renderer right')[0].addEventListener('dblclick', self.onRight2DContDblClickListener);
 
-
     // directly show object if there is only 1 element in tree
     if(source.length == 0){
       return;
@@ -128,8 +127,6 @@ var viewer = viewer || {};
       }
       root =  root.children[0];
     }
-
-    window.console.log(key);
     if(key !== '-1'){
       node = this.fileSelectTree.getNodeByKey(key);
       node.setSelected(true);
@@ -282,9 +279,8 @@ var viewer = viewer || {};
     // if  there is an list of HTML5 File objects then load the volume data
     if (nodeObj.data.fileObjs && nodeObj.data.fileObjs.length) {
       var numFiles = 0;
+      var filedata = [];
       var self = this;
-
-      self.volume.filedata = [];
 
       function render() {
         document.getElementById('sliceX').firstChild.style.visibility = 'visible';
@@ -299,14 +295,16 @@ var viewer = viewer || {};
         var reader = new FileReader();
 
         reader.onload = function(ev) {
-          self.volume.filedata[pos] = reader.result;
+          filedata[pos] = reader.result;
           ++numFiles;
           if (numFiles==nodeObj.data.fileObjs.length) {
+            self.volume.filedata = filedata;
             render();
           }
         };
         reader.readAsArrayBuffer(fileObj);
       }
+
       for (var i=0; i<nodeObj.data.fileObjs.length; i++) {
         add(nodeObj.data.fileObjs[i], i);
       }
@@ -722,7 +720,9 @@ var viewer = viewer || {};
   viewer.Viewer.prototype.onFileTreeNodeExpand = function(node) {
     var data = {key: node.key, expanded: node.isExpanded()};
 
-    this.collaborator.send('fileTreeNodeExpanded', data);
+    if(this.collaborator !== null){
+      this.collaborator.send('fileTreeNodeExpanded', data);
+    }
   }
 
 
@@ -739,9 +739,10 @@ var viewer = viewer || {};
 
   viewer.Viewer.prototype.onFileTreeNodeSelect = function(node) {
     var data = {key: node.key, selected: node.isSelected()};
+
     if(this.collaborator !== null){
-    this.collaborator.send('fileTreeNodeSelected', data);
-  }
+      this.collaborator.send('fileTreeNodeSelected', data);
+    }
     this._fileTreeNodeSelectHandler(node);
   }
 
