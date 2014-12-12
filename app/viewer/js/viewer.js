@@ -783,7 +783,9 @@ var viewer = viewer || {};
   viewer.Viewer.prototype.on3DContDblClick = function() {
     var contHeight = this._3DContDblClickHandler();
 
-    this.collaborator.send('3DContDblClicked', contHeight);
+    if(this.collaborator !== null){
+      this.collaborator.send('3DContDblClicked', contHeight);
+    }
   }
 
 
@@ -816,7 +818,9 @@ var viewer = viewer || {};
 
 
   viewer.Viewer.prototype.on2DContDblClick = function(cont) {
-    this.collaborator.send('2DContDblClicked', cont);
+    if(this.collaborator !== null){
+      this.collaborator.send('2DContDblClicked', cont);
+    }
     this._2DContDblClickHandler(cont);
   }
 
@@ -861,11 +865,13 @@ var viewer = viewer || {};
 
 
   // local camera view change handler
-  viewer.Viewer.prototype.onCameraViewChange = function(dataObj, container){
+  viewer.Viewer.prototype.onCameraViewChange = function(dataObj, container) {
     if (!container) {
       container = 'vol3D';
     }
-    this.collaborator.send('cameraViewChanged', {data:dataObj, cont: container});
+    if (this.collaborator !== null) {
+      this.collaborator.send('cameraViewChanged', {data:dataObj, cont: container});
+    }
   }
 
 
