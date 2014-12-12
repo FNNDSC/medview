@@ -32,7 +32,7 @@ var app = app || {};
     var self = this;
     dirBtn.onchange = function(e) {
       var dir = e.target.files;
-      window.console.log(dir);
+
       self._numFiles = dir.length;
       for (var i=0; i<self._numFiles; i++) {
         self.add(dir[i]);
@@ -46,7 +46,12 @@ var app = app || {};
    * Add file into internal data structures
    */
     app.App.prototype.add = function(fileObj) {
-      var path = fileObj.webkitRelativePath;
+      var path;
+      if (fileObj.webkitRelativePath) {
+        path = fileObj.webkitRelativePath;
+      } else {
+        path = fileObj.mozFullPath;
+      }
       var url = path.substring(0, path.lastIndexOf('/') + 1);
       var filename = fileObj.name;
 
@@ -84,7 +89,12 @@ var app = app || {};
         var byteArray = new Uint8Array(arrayBuffer);
         // Invoke the parseDicom function and get back a DataSet object with the contents
         var dataSet, patientID, studyInstanceUID, seriesInstanceUID, sopInstanceUID;
-        var path = fileObj.webkitRelativePath;
+        var path;
+        if (fileObj.webkitRelativePath) {
+          path = fileObj.webkitRelativePath;
+        } else {
+          path = fileObj.mozFullPath;
+        }
         var url = path.substring(0, path.lastIndexOf('/') + 1);
         var filename = fileObj.name;
 
