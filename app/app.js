@@ -185,39 +185,29 @@ var app = app || {};
     app.App.prototype._parseTree = function(subtree, obj, depth, type, files, key){
         // get current location
         var path = obj.url.split('/');
+        var indexSubTree;
 
-        if(depth >= path.length){
-            // loop through tree and look for 'title' match
-            var indexSubTree = -1;
-
-            for (var i=0; i < subtree.length; i++){
-                if(subtree[i].title == obj.title){
-                    indexSubTree = i;
-                    break;
-                }
-            }
-            if(indexSubTree == -1){
-                indexSubTree = subtree.length;
-                subtree.push(this._createTreeFile(obj.fileObj[0].name, type, obj.url, obj.fileObj, key + indexSubTree.toString()));
-            }
+        // if we reach the file
+        if (depth >= path.length) {
+            indexSubTree = subtree.length;
+            subtree.push(this._createTreeFile(obj.fileObj[0].name, type, obj.url, obj.fileObj, key + indexSubTree.toString()));
             return;
         }
         // subtree is not there, create it
-        var indexSubTree = -1;
+        indexSubTree = -1;
         // loop through tree and look for 'title' match
-        for (var i=0; i < subtree.length; i++){
-            if(subtree[i].title == path[depth]){
-                indexSubTree = i;
-                break;
-            }
+        for (var i=0; i<subtree.length; i++){
+          if (subtree[i].title == path[depth]) {
+            indexSubTree = i;
+            break;
+          }
         }
         // we push object to children
         if(indexSubTree == -1){
             indexSubTree = subtree.length;
             key = key.toString() + subtree.length.toString();
             subtree.push(this._createTreeFolder(path[depth], key));
-        }
-        else{
+        } else {
             key = subtree[indexSubTree].key;
         }
         this._parseTree(subtree[indexSubTree].children, obj, depth + 1, type, files, key);
