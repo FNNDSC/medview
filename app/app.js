@@ -60,11 +60,11 @@ var app = app || {};
       } else {
         // push fibers, meshes and volumes into this._indexedData
         if (viewer.Viewer.isFibers(filename)) {
-          this._indexedData['fibers'].push({'url': url, 'fileObj': fileObj});
+          this._indexedData['fibers'].push({'url': url, 'fileObj': [fileObj]});
         } else if (viewer.Viewer.isGeomModel(filename)) {
-            this._indexedData['mesh'].push({'url': url, 'fileObj': fileObj});
+            this._indexedData['mesh'].push({'url': url, 'fileObj': [fileObj]});
         } else if (viewer.Viewer.isVolume(filename)) {
-            this._indexedData['volume'].push({'url': url, 'fileObj': fileObj});
+            this._indexedData['volume'].push({'url': url, 'fileObj': [fileObj]});
         }
         ++this._numNotDicoms;
         // if all files have been added then create view
@@ -146,6 +146,7 @@ var app = app || {};
         }
       }
       // Build source object
+      window.console.log(this._indexedData);
       var source = this.buildSource();
       // Instantiate a new Viewer object
       if (this.view) {
