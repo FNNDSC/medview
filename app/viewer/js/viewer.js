@@ -1196,7 +1196,7 @@ var viewer = viewer || {};
           '</div>' +
         '</details>' +
       '</div>' +
-      '<div class="row-fluid largeRenderer renderer">' +
+      '<div class="row-fluid largeRenderer renderer main">' +
         '<div id="vol3D" class="border-top yellow"></div>' +
         '<div id="xcontroller" class="x-controller"></div>' +
       '</div>' +
