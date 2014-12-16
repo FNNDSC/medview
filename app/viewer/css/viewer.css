@@ -1,5 +1,10 @@
 @import url("../lib/fancytree/css/skin-viewer/ui.fancytree.css");
 
+div#background{
+	height: 100%;
+	background-color: #353535;
+}
+
 .directory-btn{
 	background-color: #414141;
 	color: #FFF;
@@ -8,7 +13,7 @@
 	border-radius: 5px;
 	border-style: solid;
 	border-with: 1px;
-	}
+}
 
 .renderer{
 	display: block;

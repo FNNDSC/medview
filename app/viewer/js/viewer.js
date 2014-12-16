@@ -1182,7 +1182,7 @@ var viewer = viewer || {};
 
   // static method to generate the html interface for a Viewer
   viewer.Viewer.getHTMLTemplate = function(){
-    return  '<div style="height: 100%; background-color: #353535">' +
+    return  '<div id="background" class="row-fluid largeRenderer renderer">' +
     '<div class="topLeftContainer">' +
         '<div class="collaborate-btn bordered">' +
           '<button onclick="TogetherJS(this); return false;">Start collaboration</button>' +
@@ -1196,7 +1196,7 @@ var viewer = viewer || {};
           '</div>' +
         '</details>' +
       '</div>' +
-      '<div class="row-fluid largeRenderer renderer main">' +
+      '<div class="row-fluid largeRenderer renderer">' +
         '<div id="vol3D" class="border-top yellow"></div>' +
         '<div id="xcontroller" class="x-controller"></div>' +
       '</div>' +
