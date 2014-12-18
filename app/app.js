@@ -27,16 +27,89 @@ var app = app || {};
     // Viewer object
     this.view = null;
 
+    var self = this;
+
     // Event handler for the directory loader button
     var dirBtn = document.getElementById('dirbtn');
-    var self = this;
     dirBtn.onchange = function(e) {
-      var dir = e.target.files;
+      var files = e.target.files;
+      var fileObj;
 
-      self._numFiles = dir.length;
-      for (var i=0; i<self._numFiles; i++) {
-        self.add(dir[i]);
+      self._numFiles = files.length;
+      if (self._numFiles && !(files[0].webkitRelativePath || files[0].mozFullPath)) {
+        alert('Unsuported browser');
       }
+      for (var i=0; i<self._numFiles; i++) {
+        fileObj = files[i];
+        if (fileObj.webkitRelativePath) {
+          fileObj.fullPath = fileObj.webkitRelativePath;
+        } else if (fileObj.mozFullPath) {
+          fileObj.fullPath = fileObj.mozFullPath;
+        }
+        self.add(files[i]);
+      }
+    }
+
+    // Event handler for the dropzone
+    var dropzone = document.getElementById('directoryselection');
+
+    dropzone.ondragenter = function(e) {
+      e.preventDefault();
+    }
+
+    dropzone.ondragover = function(e) {
+      e.preventDefault();
+    }
+
+    dropzone.ondrop = function(e) {
+      e.preventDefault();
+      var length = e.dataTransfer.items.length;
+      // array to control when the entire tree has been read. This happens when
+      // all it's entries are different from zero
+      var hasBeenRead = [];
+      var files = [];
+
+      function readFiles(entry) {
+        var pos = hasBeenRead.length;
+        hasBeenRead[pos] = 0;
+
+        function readingDone() {
+          hasBeenRead[pos] = 1;
+          for (var i=0; i<hasBeenRead.length; i++) {
+            if (hasBeenRead[i] == 0) {
+              break;
+            }
+          }
+          if (i >= hasBeenRead.length) {
+            self._numFiles = files.length;
+            for (i=0; i<self._numFiles; i++) {
+              self.add(files[i]);
+            }
+          }
+        }
+
+        if (entry.isFile) {
+          entry.file(function(file){
+            file.fullPath = entry.fullPath;
+            files.push(file);
+            readingDone();
+          });
+        } else if (entry.isDirectory) {
+          var dirReader = entry.createReader();
+          dirReader.readEntries(function(entries){
+            var idx = entries.length; //manage empty dir
+            while (idx--) { //read last entry until all have been read
+              readFiles(entries[idx]);
+            }
+            readingDone();
+          });
+        }
+      }
+
+      for (var i = 0; i<length; i++) {
+        readFiles(e.dataTransfer.items[i].webkitGetAsEntry());
+      }
+
     }
 
   }
@@ -46,12 +119,7 @@ var app = app || {};
    * Add file into internal data structures
    */
     app.App.prototype.add = function(fileObj) {
-      var path;
-      if (fileObj.webkitRelativePath) {
-        path = fileObj.webkitRelativePath;
-      } else {
-        path = fileObj.mozFullPath;
-      }
+      var path = fileObj.fullPath;
       var url = path.substring(0, path.lastIndexOf('/') + 1);
       var filename = fileObj.name;
 
@@ -89,12 +157,7 @@ var app = app || {};
         var byteArray = new Uint8Array(arrayBuffer);
         // Invoke the parseDicom function and get back a DataSet object with the contents
         var dataSet, patientID, studyInstanceUID, seriesInstanceUID, sopInstanceUID;
-        var path;
-        if (fileObj.webkitRelativePath) {
-          path = fileObj.webkitRelativePath;
-        } else {
-          path = fileObj.mozFullPath;
-        }
+        var path = fileObj.fullPath;
         var url = path.substring(0, path.lastIndexOf('/') + 1);
         var filename = fileObj.name;
 
@@ -146,7 +209,6 @@ var app = app || {};
         }
       }
       // Build source object
-      window.console.log(this._indexedData);
       var source = this.buildSource();
       // Instantiate a new Viewer object
       if (this.view) {
