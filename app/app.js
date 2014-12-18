@@ -36,21 +36,22 @@ var app = app || {};
       var fileObj;
 
       self._numFiles = files.length;
-      if (self._numFiles && !(files[0].webkitRelativePath || files[0].mozFullPath)) {
+      if (self._numFiles && !(('webkitRelativePath' in files[0]) || ('mozFullPath' in files[0]))) {
         alert('Unsuported browser');
+        return;
       }
       for (var i=0; i<self._numFiles; i++) {
         fileObj = files[i];
-        if (fileObj.webkitRelativePath) {
+        if ('webkitRelativePath' in fileObj) {
           fileObj.fullPath = fileObj.webkitRelativePath;
-        } else if (fileObj.mozFullPath) {
+        } else if ('mozFullPath' in fileObj) {
           fileObj.fullPath = fileObj.mozFullPath;
         }
-        self.add(files[i]);
+        self.add(fileObj);
       }
     }
 
-    // Event handler for the dropzone
+    // Event handlers for the dropzone
     var dropzone = document.getElementById('directoryselection');
 
     dropzone.ondragenter = function(e) {
@@ -63,6 +64,28 @@ var app = app || {};
 
     dropzone.ondrop = function(e) {
       e.preventDefault();
+
+      if (!e.dataTransfer.items) {
+          if(e.dataTransfer.files){
+            var files = e.dataTransfer.files;
+            var fileObj;
+
+            self._numFiles = files.length;
+            if (self._numFiles && !('mozFullPath' in files[0])) {
+              alert('Unsuported browser');
+              return;
+            }
+            for (var i=0; i<self._numFiles; i++) {
+              fileObj = files[i];
+              fileObj.fullPath = fileObj.mozFullPath;
+              self.add(fileObj);
+  	        }
+          } else {
+            alert('Unsuported browser');
+          }
+          return;
+      }
+
       var length = e.dataTransfer.items.length;
       // array to control when the entire tree has been read. This happens when
       // all it's entries are different from zero
