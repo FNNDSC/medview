@@ -25,8 +25,10 @@ var fileManager = fileManager || {};
 
   }
 
-
-  fileManager.FileManager.prototype.requestFileSystem = function(file){
+  /**
+   * Request sandboxed filesystem
+   */
+  fileManager.FileManager.prototype.requestFileSystem = function() {
     var self = this;
 
     // The file system has been prefixed as of Google Chrome 12:
@@ -43,7 +45,11 @@ var fileManager = fileManager || {};
     }
   }
 
-
+  /**
+   * Filesystem errors' handler callback
+   *
+   * @param {Object} FileError object.
+   */
   fileManager.FileManager.prototype.fsErrorHandler = function(fe) {
     var msg = '';
 
@@ -70,15 +76,40 @@ var fileManager = fileManager || {};
     console.log('Error: ' + msg);
   }
 
+  /**
+   * Determine whether a file exists in the sandboxed FS
+   *
+   * @param {String} file path.
+   */
+  fileManager.FileManager.prototype.isLocalFile = function(fPath) {
 
-  fileManager.FileManager.prototype.isLocalFile = function(file) {}
+  }
 
-  fileManager.FileManager.prototype.readLocalFile = function(fileArray) {}
+  /**
+   * Read a list of files from the sandboxed FS
+   *
+   * @param {Array} file path.
+   */
+  fileManager.FileManager.prototype.readLocalFile = function(fPathArray) {
+    var isFile = false;
 
-  fileManager.FileManager.prototype.writeLocalFile = function(fileArray) {}
+    if (this.fs) {
+      this.fs.root.getFile('log.txt', {create: false}, function(fileEntry) {
 
-  fileManager.FileManager.prototype.isInCloud = function(file) {}
+     // fileEntry.isFile === true
+     // fileEntry.name == 'log.txt'
+     // fileEntry.fullPath == '/log.txt'
 
-  fileManager.FileManager.prototype.cloudUpload = function(fileArray) {}
+   }, errorHandler);
+    }
+    return isFile;
 
-  fileManager.FileManager.prototype.cloudDownload = function(fileArray) {}
+  }
+
+  fileManager.FileManager.prototype.writeLocalFile = function(fPathArray) {}
+
+  fileManager.FileManager.prototype.isInCloud = function(fPath) {}
+
+  fileManager.FileManager.prototype.cloudUpload = function(fPathArray) {}
+
+  fileManager.FileManager.prototype.cloudDownload = function(fPathArray) {}
