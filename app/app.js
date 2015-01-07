@@ -326,6 +326,21 @@ var app = app || {};
                 };
     }
 
+    app.App.prototype.setCloud = function(cloudName) {
+      switch(cloudName) {
+        case 'GDrive':
+          this.cloud = new fm.GDriveFileManager();
+          break;
+        case 'Dropbox':
+          this.cloud = new fm.DropboxFileManager();
+          break;
+        default:
+          console.log('Unknown cloud name');
+          break;
+      };
+    }
+
+
 
 /**
  * Entry point
