@@ -75,54 +75,44 @@ var fm = fm || {};
   }
 
   /**
-   * Filesystem errors' handler callback
-   *
-   * @param {Object} FileError object.
-   */
-  fm.LocalFileManager.prototype.fsErrorHandler = function(fe) {
-    var msg = '';
-
-    switch(fe.code) {
-      case FileError.QUOTA_EXCEEDED_ERR:
-        msg = 'QUOTA_EXCEEDED_ERR';
-        break;
-      case FileError.NOT_FOUND_ERR:
-        msg = 'NOT_FOUND_ERR';
-        break;
-      case FileError.SECURITY_ERR:
-        msg = 'SECURITY_ERR';
-        break;
-      case FileError.INVALID_MODIFICATION_ERR:
-        msg = 'INVALID_MODIFICATION_ERR';
-        break;
-      case FileError.INVALID_STATE_ERR:
-        msg = 'INVALID_STATE_ERR';
-        break;
-      default:
-        msg = 'Unknown Error';
-        break;
-    };
-    console.log('Error: ' + msg);
-  }
-
-  /**
    * Determine whether a file exists in the sandboxed FS
    *
    * @param {String} file's path.
+   * @param {Function} callback whose argument is the File object if found or
+   * null otherwise.
    */
-  fm.LocalFileManager.prototype.isFile = function(fPath) {
+  fm.LocalFileManager.prototype.isFile = function(fPath, callback) {
 
+    function errorHandler(e) {
+      console.log('File not found. Error code: ' + e.code)
+      callback(null);
+    }
+
+    if (this.fs) {
+      this.fs.root.getFile(fPath, {create: false}, function(fileEntry) {
+        // Get a File object representing the file,
+        fileEntry.file(function(fileObj) {
+          callback(fileObj);
+        }, errorHandler)
+      }, errorHandler);
+    } else {
+      throw new Error('No filesystem previously granted');
+    }
   }
 
   /**
    * Read a file from the sandboxed FS
    *
    * @param {String} file's path.
-   * @param {Function} callback with an ArrayBuffer object containing the file
-   * data as its argument.
+   * @param {Function} callback whose argument is an ArrayBuffer object containing
+   * the file data if the file is successfuly read or null otherwise.
    */
   fm.LocalFileManager.prototype.readFile = function(fPath, callback) {
-    var self = this;
+
+    function errorHandler(e) {
+      console.log('Could not read file. Error code: ' + e.code)
+      callback(null);
+    }
 
     if (this.fs) {
       this.fs.root.getFile(fPath, {create: false}, function(fileEntry) {
@@ -134,8 +124,10 @@ var fm = fm || {};
             callback(this.result);
           }
           reader.readAsArrayBuffer(fileObj);
-        }, self.fsErrorHandler)
-        }, self.fsErrorHandler);
+        }, errorHandler)
+      }, errorHandler);
+    } else {
+      throw new Error('No filesystem previously granted');
     }
   }
 
