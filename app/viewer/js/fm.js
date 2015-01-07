@@ -115,35 +115,36 @@ var fm = fm || {};
   }
 
   /**
-   * Read a list of files from the sandboxed FS
+   * Read a file from the sandboxed FS
    *
-   * @param {Array} file's path.
+   * @param {String} file's path.
+   * @param {Function} callback with an ArrayBuffer object containing the file
+   * data as its argument.
    */
-  fm.LocalFileManager.prototype.readFile = function(fPathArray) {
-    var numOfReadFiles = 0;
+  fm.LocalFileManager.prototype.readFile = function(fPath, callback) {
+    var self = this;
 
     if (this.fs) {
-      for (var i=0; i<fPathArray.length; i++) {
+      this.fs.root.getFile(fPath, {create: false}, function(fileEntry) {
+        // Get a File object representing the file,
+        fileEntry.file(function(fileObj) {
+          var reader = new FileReader();
 
-      }
-      this.fs.root.getFile('log.txt', {create: false}, function(fileEntry) {
-
-     // fileEntry.isFile === true
-     // fileEntry.name == 'log.txt'
-     // fileEntry.fullPath == '/log.txt'
-
-   }, errorHandler);
+          reader.onload = function(ev) {
+            callback(this.result);
+          }
+          reader.readAsArrayBuffer(fileObj);
+        }, self.fsErrorHandler)
+        }, self.fsErrorHandler);
     }
-    return isFile;
-
   }
 
   /**
-   * Write a list of files to the sandboxed FS
+   * Write a file to the sandboxed FS
    *
-   * @param {Array} file's path.
+   * @param {String} file's path.
    */
-  fm.LocalFileManager.prototype.writeFile = function(fPathArray) {}
+  fm.LocalFileManager.prototype.writeFile = function(fPath) {}
 
 
   /**
@@ -171,18 +172,18 @@ var fm = fm || {};
   }
 
   /**
-   * Read a list of files from GDrive cloud
+   * Read a file from GDrive cloud
    *
-   * @param {Array} file's url.
+   * @param {String} file's url.
    */
-  fm.GDriveFileManager.prototype.readFile = function(urlArray) {}
+  fm.GDriveFileManager.prototype.readFile = function(url) {}
 
   /**
-   * Write a list of files to GDrive cloud
+   * Write a file to GDrive cloud
    *
-   * @param {Array} file's url.
+   * @param {String} file's url.
    */
-  fm.LocalFileManager.prototype.writeFile = function(urlArray) {}
+  fm.LocalFileManager.prototype.writeFile = function(url) {}
 
 
   /**
@@ -210,15 +211,15 @@ var fm = fm || {};
   }
 
   /**
-   * Read a list of files from Dropbox cloud
+   * Read a file from Dropbox cloud
    *
-   * @param {Array} file's url.
+   * @param {String} file's url.
    */
-  fm.DropboxFileManager.prototype.readFile = function(urlArray) {}
+  fm.DropboxFileManager.prototype.readFile = function(url) {}
 
   /**
-   * Write a list of files to Dropbox cloud
+   * Write a file to Dropbox cloud
    *
-   * @param {Array} file's url.
+   * @param {String} file's url.
    */
-  fm.DropboxFileManager.prototype.writeFile = function(urlArray) {}
+  fm.DropboxFileManager.prototype.writeFile = function(url) {}
