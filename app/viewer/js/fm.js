@@ -84,7 +84,7 @@ var fm = fm || {};
   fm.LocalFileManager.prototype.isFile = function(fPath, callback) {
 
     function errorHandler(e) {
-      console.log('File not found. Error code: ' + e.code)
+      console.log('File not found. Error code: ' + e.code);
       callback(null);
     }
 
@@ -93,7 +93,7 @@ var fm = fm || {};
         // Get a File object representing the file,
         fileEntry.file(function(fileObj) {
           callback(fileObj);
-        }, errorHandler)
+        }, errorHandler);
       }, errorHandler);
     } else {
       throw new Error('No filesystem previously granted');
@@ -110,7 +110,7 @@ var fm = fm || {};
   fm.LocalFileManager.prototype.readFile = function(fPath, callback) {
 
     function errorHandler(e) {
-      console.log('Could not read file. Error code: ' + e.code)
+      console.log('Could not read file. Error code: ' + e.code);
       callback(null);
     }
 
@@ -123,8 +123,9 @@ var fm = fm || {};
           reader.onload = function(ev) {
             callback(this.result);
           }
+
           reader.readAsArrayBuffer(fileObj);
-        }, errorHandler)
+        }, errorHandler);
       }, errorHandler);
     } else {
       throw new Error('No filesystem previously granted');
@@ -135,8 +136,51 @@ var fm = fm || {};
    * Write a file to the sandboxed FS
    *
    * @param {String} file's path.
+   * @param {Array} ArrayBuffer object containing the file data.
+   * @param {Function} optional callback whose argument is the File object or
+   * null otherwise.
    */
-  fm.LocalFileManager.prototype.writeFile = function(fPath) {}
+  fm.LocalFileManager.prototype.writeFile = function(fPath, data, callback) {
+
+      function errorHandler(e) {
+        console.log('Could not write file. Error code: ' + e.code);
+        if (callback) {
+          callback(null);
+        }
+      }
+
+      if (this.fs) {
+        this.fs.root.getFile(fPath, {create: true}, function(fileEntry) {
+          // Create a FileWriter object for our FileEntry (fPath).
+          fileEntry.createWriter(function(fileWriter) {
+
+            fileWriter.onwrite = function(e) {
+              if (callback) {
+                // Get a File object representing the file,
+                fileEntry.file(function(fileObj) {
+                  callback(fileObj);
+                }, errorHandler);
+              }
+            }
+
+            fileWriter.onerror = function(e) {
+              console.log('Could not write file. Error code: ' + e.toString());
+              if (callback) {
+                callback(null);
+              }
+            }
+
+            var bBuilder = new BlobBuilder();
+            bBuilder.append(data);
+            var dataBlob = bBuilder.getBlob();
+            fileWriter.write(blob);
+
+          }, errorHandler);
+        }, errorHandler);
+      } else {
+        throw new Error('No filesystem previously granted');
+      }
+  }
 
 
   /**
