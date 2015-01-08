@@ -70,7 +70,7 @@ var fm = fm || {};
     if (window.requestFileSystem) {
       window.requestFileSystem(window.TEMPORARY, 5*1024*1024*1024, function(fs){
         self.fs = fs;
-      }, self.fsErrorHandler);
+      }, function(e) {throw new Error('Could not grant filesystem. Error code: ' + e.code)});
     }
   }
 
