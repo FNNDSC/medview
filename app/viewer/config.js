@@ -17,16 +17,17 @@ require.config({
         xtk: 'lib/xtk_edge',
         xdat: 'lib/xtk_xdat.gui',
         jquery: 'lib/jquery.min',
+        fm: 'js/fm',
         viewer: 'js/viewer',
     }
 });
 
 // 1st level dependencies
-require(['jquery', 'jquery_ui'], function() {
+require(['jquery', 'jquery_ui', 'fm'], function() {
   // 2nd level dependencies
   require(['collab', 'fancytree', 'xtk', 'xdat', 'dicomParser'], function() {
     // 3rd level dependencies
-    require(['https://togetherjs.com/togetherjs-min.js', 'viewer'], function() {
+    require(['https://togetherjs.com/togetherjs-min.js', 'https://apis.google.com/js/client.js', 'viewer'], function() {
       require([
 
         // Put the path to your script (the one who instantiates a viewer object)
