@@ -188,7 +188,9 @@ var fm = fm || {};
    * Uses Google Drive's API
    */
   fm.GDriveFileManager = function() {
-
+    this.CLIENT_ID = '358010366372-o8clkqjol0j533tp6jlnpjr2u2cdmks6.apps.googleusercontent.com';
+    // Per-file access to files uploaded through the API
+    this.SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
   }
 
@@ -197,6 +199,44 @@ var fm = fm || {};
    */
   fm.GDriveFileManager.prototype = Object.create(fm.AbstractFileManager.prototype);
   fm.GDriveFileManager.prototype.constructor = fm.GDriveFileManager;
+
+  /**
+   * Request GDrive filesystem (authorization and scope)
+   */
+  fm.GDriveFileManager.prototype.requestFileSystem = function() {
+
+  }
+
+  /**
+   * Check if the current user has authorized the application.
+   */
+  fm.GDriveFileManager.prototype.checkAuth = function() {
+    gapi.auth.authorize(
+      {'client_id': this.CLIENT_ID, 'scope': this.SCOPES, 'immediate': true},
+      this.handleAuthResult);
+  }
+
+  /**
+   * Called when authorization server replies.
+   *
+   * @param {Object} authResult Authorization result.
+   */
+   fm.GDriveFileManager.prototype.handleAuthResult = function(authResult) {
+     var authButton = document.getElementById('authorizeButton');
+
+     authButton.style.display = 'none';
+     if (authResult && !authResult.error) {
+
+     } else {
+       // No access token could be retrieved, show the button to start the authorization flow.
+       authButton.style.display = 'block';
+       authButton.onclick = function() {
+         gapi.auth.authorize(
+           {'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': false},
+           this.handleAuthResult);
+       };
+     }
+   }
 
   /**
    * Determine whether a file exists in the GDrive cloud
