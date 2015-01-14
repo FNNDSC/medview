@@ -229,7 +229,7 @@ var fm = fm || {};
       }
 
       this.fs.getDirectory(basedir, {create: false}, function(dirEntry) {
-        writeFile();  
+        writeFile();
       }, function (e) {if (e.code === FileError.NOT_FOUND_ERR) {
         self.createPath(basedir, writeFile);} else {
           errorHandler(e);
@@ -299,6 +299,65 @@ var fm = fm || {};
    }
 
   /**
+   * Create a new directory path in the GDrive cloud
+   *
+   * @param {String} new absolute path to be created.
+   * @param {Function} optional callback whose argument is the folder creation
+   * response object or null otherwise.
+   */
+  fm.GDriveFileManager.prototype.createPath = function(path, callback) {
+
+    function createDir(rootResp, folders) {
+    // list folder with name folders[0] if it already exists
+    var findRequest = gapi.client.drive.children.list({
+      'folderId': rootResp.id,
+      'q': "mimeType='application/vnd.google-apps.folder' and title='" + folders[0] + "'"
+      });
+
+    findRequest.execute(function(findResp) {
+      // if folder not found then create it
+      if (findResp.items.length==0) {
+        var request = gapi.client.drive.files.insert({
+          'resource': {'title': folders[0], 'mimeType': 'application/vnd.google-apps.folder', 'parents': [{'id': rootResp.id}]}
+        });
+
+        request.execute(function(resp) {
+          folders = folders.slice(1);
+          if (folders.length) {
+            //recursively create subsequent folders if needed
+            createDir(resp, folders);
+          } else if (callback) {
+            callback(resp);
+          }
+        });
+
+      } else {
+        folders = folders.slice(1);
+        if (folders.length) {
+          // recursively create subsequent folders if needed
+          createDir(findResp.items[0], folders);
+        } else if (callback) {
+          callback(findResp.items[0]);
+        }
+      }
+    });
+
+    }
+
+    folders = path.split('/');
+    // Throw out './' or '/' and move on to prevent something like '/foo/.//bar'.
+    if (folders[0] == '.' || folders[0] == '') {
+      folders = folders.slice(1);
+    }
+    if (folders.length) {
+      createDir({'id': 'root'}, folders);
+    } else if (callback) {
+      callback(null);
+    }
+
+  }
+
+  /**
    * Determine whether a file exists in the GDrive cloud
    *
    * @param {String} file's url.
@@ -323,7 +382,7 @@ var fm = fm || {};
    */
   fm.GDriveFileManager.prototype.writeFile = function(filePath, fileData, callback) {
     // callback to insert new file.
-    function insertFile(fileData, callback) {
+    function insertFile() {
       const boundary = '-------314159265358979323846';
       const delimiter = "\r\n--" + boundary + "\r\n";
       const close_delim = "\r\n--" + boundary + "--";
@@ -365,10 +424,10 @@ var fm = fm || {};
 
     if (!this.driveAPILoaded) {
       gapi.client.load('drive', 'v2', function() {
-        insertFile(fileData);
+        insertFile();
         });
     } else {
-      insertFile(fileData);
+      insertFile();
     }
   }
 
@@ -410,6 +469,7 @@ var fm = fm || {};
    * @param {String} file's url.
    */
   fm.DropboxFileManager.prototype.writeFile = function(url) {}
+
 
   /**
    * Convert ArrayBuffer to String
