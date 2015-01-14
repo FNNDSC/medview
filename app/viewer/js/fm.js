@@ -95,10 +95,6 @@ var fm = fm || {};
     if (this.fs) {
 
       function createDir(rootDirEntry, folders) {
-        // Throw out './' or '/' and move on to prevent something like '/foo/.//bar'.
-        if (folders[0] == '.' || folders[0] == '') {
-          folders = folders.slice(1);
-        }
         // exclusive:false means if the folder already exists then don't throw an error
         rootDirEntry.getDirectory(folders[0], {create: true, exclusive:false}, function(dirEntry) {
           // Recursively add the new subfolder (if we still have another to create).
@@ -112,7 +108,8 @@ var fm = fm || {};
 
       }
 
-      createDir(this.fs , path.split('/')); // fs.root is a DirectoryEntry
+      folders = fm.path2array(path);
+      createDir(this.fs, folders); // fs.root is a DirectoryEntry
 
     } else {
       throw new Error('No filesystem previously granted');
@@ -308,47 +305,43 @@ var fm = fm || {};
   fm.GDriveFileManager.prototype.createPath = function(path, callback) {
 
     function createDir(rootResp, folders) {
-    // list folder with name folders[0] if it already exists
-    var findRequest = gapi.client.drive.children.list({
-      'folderId': rootResp.id,
-      'q': "mimeType='application/vnd.google-apps.folder' and title='" + folders[0] + "'"
-      });
-
-    findRequest.execute(function(findResp) {
-      // if folder not found then create it
-      if (findResp.items.length==0) {
-        var request = gapi.client.drive.files.insert({
-          'resource': {'title': folders[0], 'mimeType': 'application/vnd.google-apps.folder', 'parents': [{'id': rootResp.id}]}
+      // list folder with name folders[0] if it already exists
+      var findRequest = gapi.client.drive.children.list({
+        'folderId': rootResp.id,
+        'q': "mimeType='application/vnd.google-apps.folder' and title='" + folders[0] + "'"
         });
 
-        request.execute(function(resp) {
+      findRequest.execute(function(findResp) {
+        // if folder not found then create it
+        if (findResp.items.length==0) {
+          var request = gapi.client.drive.files.insert({
+            'resource': {'title': folders[0], 'mimeType': 'application/vnd.google-apps.folder', 'parents': [{'id': rootResp.id}]}
+          });
+
+          request.execute(function(resp) {
+            folders = folders.slice(1);
+            if (folders.length) {
+              //recursively create subsequent folders if needed
+              createDir(resp, folders);
+            } else if (callback) {
+              callback(resp);
+            }
+          });
+
+        } else {
           folders = folders.slice(1);
           if (folders.length) {
-            //recursively create subsequent folders if needed
-            createDir(resp, folders);
+            // recursively create subsequent folders if needed
+            createDir(findResp.items[0], folders);
           } else if (callback) {
-            callback(resp);
+            callback(findResp.items[0]);
           }
-        });
-
-      } else {
-        folders = folders.slice(1);
-        if (folders.length) {
-          // recursively create subsequent folders if needed
-          createDir(findResp.items[0], folders);
-        } else if (callback) {
-          callback(findResp.items[0]);
         }
-      }
-    });
+      });
 
     }
 
-    folders = path.split('/');
-    // Throw out './' or '/' and move on to prevent something like '/foo/.//bar'.
-    if (folders[0] == '.' || folders[0] == '') {
-      folders = folders.slice(1);
-    }
+    folders = fm.path2array(path);
     if (folders.length) {
       createDir({'id': 'root'}, folders);
     } else if (callback) {
@@ -360,10 +353,12 @@ var fm = fm || {};
   /**
    * Determine whether a file exists in the GDrive cloud
    *
-   * @param {String} file's url.
+   * @param {String} file's path.
+   * @param {Function} callback whose argument is the File object if found or
+   * null otherwise.
    */
-  fm.GDriveFileManager.prototype.isFile = function(url) {
-
+  fm.GDriveFileManager.prototype.isFile = function(filePath, callback) {
+    entries = fm.path2array(filePath);
   }
 
   /**
@@ -493,4 +488,18 @@ var fm = fm || {};
       bufView[i] = str.charCodeAt(i);
     }
     return buf;
+  }
+
+  /**
+   * Split a file or folder path into an array
+   *
+   * @param {String} input path.
+   */
+  fm.path2array = function(path) {
+    entries = path.split('/');
+    // Throw out './' or '/' and move on to prevent something like '/foo/.//bar'.
+    if (entries[0] == '.' || entries[0] == '') {
+      entries = entries.slice(1);
+    }
+    return entries;
   }
