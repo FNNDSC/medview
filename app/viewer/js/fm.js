@@ -30,6 +30,8 @@ var fm = fm || {};
     throw new Error('Can not instantiate abstract classes');
   }
 
+  fm.AbstractFileManager.prototype.requestFileSystem = fm.abstractmethod;
+
   fm.AbstractFileManager.prototype.isFile = fm.abstractmethod;
 
   fm.AbstractFileManager.prototype.readFile = fm.abstractmethod;
@@ -41,7 +43,7 @@ var fm = fm || {};
 
   /**
    * Concrete class implementing a file manager for the local FS.
-   * Currently uses the HTML5's sandboxed FS API (only implemented on Chrome)
+   * Currently uses the HTML5's sandboxed FS API (only implemented in Chrome)
    */
   fm.LocalFileManager = function() {
 
@@ -58,8 +60,10 @@ var fm = fm || {};
 
   /**
    * Request sandboxed filesystem
+   *
+   * @param {Function} callback to be called when the API is ready.
    */
-  fm.LocalFileManager.prototype.requestFileSystem = function() {
+  fm.LocalFileManager.prototype.requestFileSystem = function(callback) {
     var self = this;
 
     // The file system has been prefixed as of Google Chrome 12:
@@ -72,8 +76,10 @@ var fm = fm || {};
     if (window.requestFileSystem) {
       window.requestFileSystem(window.TEMPORARY, 5*1024*1024*1024, function(fs){
         self.fs = fs;
+        callback();
       }, function(e) {throw new Error('Could not grant filesystem. Error code: ' + e.code)});
     }
+
   }
 
   /**
@@ -84,23 +90,25 @@ var fm = fm || {};
    * null otherwise.
    */
   fm.LocalFileManager.prototype.createPath = function(path, callback) {
+    var self = this;
 
-    function errorHandler(e) {
-      console.log('Could not create path. Error code: ' + e.code);
-      if (callback) {
-        callback(null);
-      }
-    }
+    function createPath() {
 
-    if (this.fs) {
+      function createFolder(rootDirEntry, folders) {
 
-      function createDir(rootDirEntry, folders) {
+        function errorHandler(e) {
+          console.log('Could not create path. Error code: ' + e.code);
+          if (callback) {
+            callback(null);
+          }
+        }
+
         // exclusive:false means if the folder already exists then don't throw an error
         rootDirEntry.getDirectory(folders[0], {create: true, exclusive:false}, function(dirEntry) {
           // Recursively add the new subfolder (if we still have another to create).
           folders = folders.slice(1);
           if (folders.length) {
-            createDir(dirEntry, folders);
+            createFolder(dirEntry, folders);
           } else if (callback) {
             callback(dirEntry);
           }
@@ -109,11 +117,16 @@ var fm = fm || {};
       }
 
       folders = fm.path2array(path);
-      createDir(this.fs, folders); // fs.root is a DirectoryEntry
+      createFolder(self.fs, folders); // fs.root is a DirectoryEntry
 
-    } else {
-      throw new Error('No filesystem previously granted');
     }
+
+    if (this.fs) {
+      createPath();
+    } else {
+      this.requestFileSystem(createPath);
+    }
+
   }
 
   /**
@@ -124,22 +137,29 @@ var fm = fm || {};
    * null otherwise.
    */
   fm.LocalFileManager.prototype.isFile = function(filePath, callback) {
+    var self = this;
 
-    function errorHandler(e) {
-      console.log('File not found. Error code: ' + e.code);
-      callback(null);
-    }
+    function findFile() {
 
-    if (this.fs) {
-      this.fs.root.getFile(filePath, {create: false}, function(fileEntry) {
+      function errorHandler(e) {
+        console.log('File not found. Error code: ' + e.code);
+        callback(null);
+      }
+
+      self.fs.root.getFile(filePath, {create: false}, function(fileEntry) {
         // Get a File object representing the file,
         fileEntry.file(function(fileObj) {
           callback(fileObj);
         }, errorHandler);
       }, errorHandler);
-    } else {
-      throw new Error('No filesystem previously granted');
     }
+
+    if (this.fs) {
+      findFile();
+    } else {
+      this.requestFileSystem(findFile);
+    }
+
   }
 
   /**
@@ -150,14 +170,16 @@ var fm = fm || {};
    * the file data if the file is successfuly read or null otherwise.
    */
   fm.LocalFileManager.prototype.readFile = function(filePath, callback) {
+    var self = this;
 
-    function errorHandler(e) {
-      console.log('Could not read file. Error code: ' + e.code);
-      callback(null);
-    }
+    function readFile() {
 
-    if (this.fs) {
-      this.fs.root.getFile(filePath, {create: false}, function(fileEntry) {
+      function errorHandler(e) {
+        console.log('Could not read file. Error code: ' + e.code);
+        callback(null);
+      }
+
+      self.fs.root.getFile(filePath, {create: false}, function(fileEntry) {
         // Get a File object representing the file,
         fileEntry.file(function(fileObj) {
           var reader = new FileReader();
@@ -169,9 +191,15 @@ var fm = fm || {};
           reader.readAsArrayBuffer(fileObj);
         }, errorHandler);
       }, errorHandler);
-    } else {
-      throw new Error('No filesystem previously granted');
+
     }
+
+    if (this.fs) {
+      readFile();
+    } else {
+      this.requestFileSystem(readFile);
+    }
+
   }
 
   /**
@@ -183,10 +211,9 @@ var fm = fm || {};
    * null otherwise.
    */
   fm.LocalFileManager.prototype.writeFile = function(filePath, fileData, callback) {
+    var self = this;
 
-    if (this.fs) {
-      var self = this;
-      var basedir = filePath.substring(0, filePath.lastIndexOf('/'));
+    function checkPathAndWriteFile() {
 
       function errorHandler(e) {
         console.log('Could not write file. Error code: ' + e.code);
@@ -225,16 +252,21 @@ var fm = fm || {};
         }, errorHandler);
       }
 
-      this.fs.getDirectory(basedir, {create: false}, function(dirEntry) {
+      var basedir = filePath.substring(0, filePath.lastIndexOf('/'));
+      self.fs.getDirectory(basedir, {create: false}, function(dirEntry) {
         writeFile();
       }, function (e) {if (e.code === FileError.NOT_FOUND_ERR) {
         self.createPath(basedir, writeFile);} else {
           errorHandler(e);
         }} );
-
-    } else {
-      throw new Error('No filesystem previously granted');
     }
+
+    if (this.fs) {
+      checkPathAndWriteFile();
+    } else {
+      this.requestFileSystem(checkPathAndWriteFile);
+    }
+
   }
 
 
@@ -243,6 +275,7 @@ var fm = fm || {};
    * Uses Google Drive's API
    */
   fm.GDriveFileManager = function() {
+    // Google's ID for this app
     this.CLIENT_ID = '358010366372-o8clkqjol0j533tp6jlnpjr2u2cdmks6.apps.googleusercontent.com';
     // Per-file access to files uploaded through the API
     this.SCOPES = 'https://www.googleapis.com/auth/drive.file';
@@ -258,9 +291,18 @@ var fm = fm || {};
   fm.GDriveFileManager.prototype.constructor = fm.GDriveFileManager;
 
   /**
-   * Request GDrive filesystem (authorization and scope)
+   * Load GDrive API
+   *
+   * @param {Function} callback to be called when the API is ready.
    */
-  fm.GDriveFileManager.prototype.requestFileSystem = function() {
+  fm.GDriveFileManager.prototype.requestFileSystem = function(callback) {
+    var self = this;
+
+    if (!this.driveAPILoaded) {
+      gapi.client.load('drive', 'v2', function() {
+        self.driveAPILoaded = true;
+        callback();
+    });
 
   }
 
@@ -293,6 +335,7 @@ var fm = fm || {};
            this.handleAuthResult);
        };
      }
+
    }
 
   /**
@@ -304,48 +347,57 @@ var fm = fm || {};
    */
   fm.GDriveFileManager.prototype.createPath = function(path, callback) {
 
-    function createDir(rootResp, folders) {
-      // list folder with name folders[0] if it already exists
-      var findRequest = gapi.client.drive.children.list({
-        'folderId': rootResp.id,
-        'q': "mimeType='application/vnd.google-apps.folder' and title='" + folders[0] + "'"
-        });
+    function createPath() {
 
-      findRequest.execute(function(findResp) {
-        // if folder not found then create it
-        if (findResp.items.length==0) {
-          var request = gapi.client.drive.files.insert({
-            'resource': {'title': folders[0], 'mimeType': 'application/vnd.google-apps.folder', 'parents': [{'id': rootResp.id}]}
+      function createFolder(rootResp, folders) {
+        // list folder with name folders[0] if it already exists
+        var findRequest = gapi.client.drive.children.list({
+          'folderId': rootResp.id,
+          'q': "mimeType='application/vnd.google-apps.folder' and title='" + folders[0] + "'"
           });
 
-          request.execute(function(resp) {
+        findRequest.execute(function(findResp) {
+          // if folder not found then create it
+          if (findResp.items.length==0) {
+            var request = gapi.client.drive.files.insert({
+              'resource': {'title': folders[0], 'mimeType': 'application/vnd.google-apps.folder', 'parents': [{'id': rootResp.id}]}
+            });
+
+            request.execute(function(resp) {
+              folders = folders.slice(1);
+              if (folders.length) {
+                //recursively create subsequent folders if needed
+                createFolder(resp, folders);
+              } else if (callback) {
+                callback(resp);
+              }
+            });
+
+          } else {
             folders = folders.slice(1);
             if (folders.length) {
-              //recursively create subsequent folders if needed
-              createDir(resp, folders);
+              // recursively create subsequent folders if needed
+              createFolder(findResp.items[0], folders);
             } else if (callback) {
-              callback(resp);
+              callback(findResp.items[0]);
             }
-          });
-
-        } else {
-          folders = folders.slice(1);
-          if (folders.length) {
-            // recursively create subsequent folders if needed
-            createDir(findResp.items[0], folders);
-          } else if (callback) {
-            callback(findResp.items[0]);
           }
-        }
-      });
+        });
 
+      }
+
+      folders = fm.path2array(path);
+      if (folders.length) {
+        createFolder({'id': 'root'}, folders);
+      } else if (callback) {
+        callback(null);
+      }
     }
 
-    folders = fm.path2array(path);
-    if (folders.length) {
-      createDir({'id': 'root'}, folders);
-    } else if (callback) {
-      callback(null);
+    if (this.driveAPILoaded) {
+      createPath();
+    } else {
+      this.requestFileSystem(createPath);
     }
 
   }
@@ -359,48 +411,59 @@ var fm = fm || {};
    */
   fm.GDriveFileManager.prototype.isFile = function(filePath, callback) {
 
-    function findFile(rootResp, entries) {
-      var findRequest;
-      // list entry with name entry[0] if it exists. The search request depends
-      // on whether we are at the filename entry or at an ancestor folder
-      if (entries.length == 1) {
-        findRequest = gapi.client.drive.children.list({
-          'folderId': rootResp.id,
-          'q': "mimeType!='application/vnd.google-apps.folder' and title='" + entries[0] + "'"
+    function findFile() {
+
+      function findEntry(rootResp, entries) {
+        var findRequest;
+        // list entry with name entry[0] if it exists. The search request depends
+        // on whether we are at the filename entry or at an ancestor folder
+        if (entries.length == 1) {
+          findRequest = gapi.client.drive.children.list({
+            'folderId': rootResp.id,
+            'q': "mimeType!='application/vnd.google-apps.folder' and title='" + entries[0] + "'"
+          });
+        } else {
+          findRequest = gapi.client.drive.children.list({
+            'folderId': rootResp.id,
+            'q': "mimeType='application/vnd.google-apps.folder' and title='" + entries[0] + "'"
+          });
+        }
+
+        findRequest.execute(function(findResp) {
+          // if entry not found
+          if (findResp.items.length==0) {
+            console.log('File not found!');
+            if (callback) {
+              callback(null);
+            }
+          } else {
+            entries = entries.slice(1);
+            if (entries.length) {
+              // recursively move to subsequent entry
+              findEntry(findResp.items[0], entries);
+            } else if (callback) {
+              callback(findResp.items[0]);
+            }
+          }
         });
-      } else {
-        findRequest = gapi.client.drive.children.list({
-          'folderId': rootResp.id,
-          'q': "mimeType='application/vnd.google-apps.folder' and title='" + entries[0] + "'"
-        });
+
       }
 
-      findRequest.execute(function(findResp) {
-        // if entry not found
-        if (findResp.items.length==0) {
-          console.log('File not found!');
-          if (callback) {
-            callback(null);
-          }
-        } else {
-          entries = entries.slice(1);
-          if (entries.length) {
-            // recursively move to subsequent entry
-            findFile(findResp.items[0], entries);
-          } else if (callback) {
-            callback(findResp.items[0]);
-          }
-        }
-      });
+      entries = fm.path2array(filePath);
+      if (entries.length) {
+        findEntry({'id': 'root'}, entries);
+      } else if (callback) {
+        callback(null);
+      }
 
     }
 
-    entries = fm.path2array(filePath);
-    if (entries.length) {
-      findFile({'id': 'root'}, entries);
-    } else if (callback) {
-      callback(null);
+    if (this.driveAPILoaded) {
+      findFile();
+    } else {
+      this.requestFileSystem(findFile);
     }
+
   }
 
   /**
@@ -418,8 +481,10 @@ var fm = fm || {};
    * @param {Function} optional callback whose argument is the response object.
    */
   fm.GDriveFileManager.prototype.writeFile = function(filePath, fileData, callback) {
+
     // callback to insert new file.
-    function insertFile() {
+    function writeFile() {
+
       const boundary = '-------314159265358979323846';
       const delimiter = "\r\n--" + boundary + "\r\n";
       const close_delim = "\r\n--" + boundary + "--";
@@ -457,15 +522,11 @@ var fm = fm || {};
         };
       }
       request.execute(callback);
+
     }
 
-    if (!this.driveAPILoaded) {
-      gapi.client.load('drive', 'v2', function() {
-        insertFile();
-        });
-    } else {
-      insertFile();
-    }
+    var basedir = filePath.substring(0, filePath.lastIndexOf('/'));
+    this.createPath(basedir, writeFile);
   }
 
 
@@ -485,11 +546,33 @@ var fm = fm || {};
   fm.DropboxFileManager.prototype.constructor = fm.DropboxFileManager;
 
   /**
+   * Load Dropbox API
+   *
+   * @param {Function} callback to be called when the API is ready.
+   */
+  fm.DropboxFileManager.prototype.requestFileSystem = function(callback) {
+
+  }
+
+  /**
+   * Create a new directory path in the Dropbox cloud
+   *
+   * @param {String} new absolute path to be created.
+   * @param {Function} optional callback whose argument is the folder creation
+   * response object or null otherwise.
+   */
+  fm.DropboxFileManager.prototype.createPath = function(path, callback) {
+
+  }
+
+  /**
    * Determine whether a file exists in the Dropbox cloud
    *
-   * @param {String} file's url.
+   * @param {String} file's path.
+   * @param {Function} callback whose argument is the file response object if
+   * found or null otherwise.
    */
-  fm.DropboxFileManager.prototype.isFile = function(url) {
+  fm.DropboxFileManager.prototype.isFile = function(filePath, callback) {
 
   }
 
@@ -498,15 +581,20 @@ var fm = fm || {};
    *
    * @param {String} file's url.
    */
-  fm.DropboxFileManager.prototype.readFile = function(url) {}
+  fm.DropboxFileManager.prototype.readFile = function(url) {
+
+  }
 
   /**
-   * Write a file to Dropbox cloud
+   * Write a file to Dropbox
    *
-   * @param {String} file's url.
+   * @param {String} file's path.
+   * @param {Array} ArrayBuffer object containing the file data.
+   * @param {Function} optional callback whose argument is the response object.
    */
-  fm.DropboxFileManager.prototype.writeFile = function(url) {}
+  fm.DropboxFileManager.prototype.writeFile = function(filePath, fileData, callback) {
 
+  }
 
   /**
    * Convert ArrayBuffer to String
