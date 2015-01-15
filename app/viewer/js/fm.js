@@ -354,11 +354,53 @@ var fm = fm || {};
    * Determine whether a file exists in the GDrive cloud
    *
    * @param {String} file's path.
-   * @param {Function} callback whose argument is the File object if found or
-   * null otherwise.
+   * @param {Function} callback whose argument is the file response object if
+   * found or null otherwise.
    */
   fm.GDriveFileManager.prototype.isFile = function(filePath, callback) {
+
+    function findFile(rootResp, entries) {
+      var findRequest;
+      // list entry with name entry[0] if it exists. The search request depends
+      // on whether we are at the filename entry or at an ancestor folder
+      if (entries.length == 1) {
+        findRequest = gapi.client.drive.children.list({
+          'folderId': rootResp.id,
+          'q': "mimeType!='application/vnd.google-apps.folder' and title='" + entries[0] + "'"
+        });
+      } else {
+        findRequest = gapi.client.drive.children.list({
+          'folderId': rootResp.id,
+          'q': "mimeType='application/vnd.google-apps.folder' and title='" + entries[0] + "'"
+        });
+      }
+
+      findRequest.execute(function(findResp) {
+        // if entry not found
+        if (findResp.items.length==0) {
+          console.log('File not found!');
+          if (callback) {
+            callback(null);
+          }
+        } else {
+          entries = entries.slice(1);
+          if (entries.length) {
+            // recursively move to subsequent entry
+            findFile(findResp.items[0], entries);
+          } else if (callback) {
+            callback(findResp.items[0]);
+          }
+        }
+      });
+
+    }
+
     entries = fm.path2array(filePath);
+    if (entries.length) {
+      findFile({'id': 'root'}, entries);
+    } else if (callback) {
+      callback(null);
+    }
   }
 
   /**
