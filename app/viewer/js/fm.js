@@ -500,7 +500,9 @@ var fm = fm || {};
 
         // Response handlers.
         xhr.onload = function() {
-          callback(xhr.responseText);
+          // convert from base 64 encoded string to ArrayBuffer
+          var fileData = fm.str2ab(atob(xhr.responseText));
+          callback(fileData);
         };
 
         xhr.onerror = function() {
@@ -685,11 +687,13 @@ var fm = fm || {};
   }
 
   /**
-   * Read a file from Dropbox cloud
+   * Read a file from the Dropbox cloud
    *
-   * @param {String} file's url.
+   * @param {String} file's path.
+   * @param {Function} callback whose argument is the file data if the file is
+   * successfuly read or null otherwise.
    */
-  fm.DropboxFileManager.prototype.readFile = function(url) {
+  fm.DropboxFileManager.prototype.readFile = function(filePath, callback) {
 
   }
 
@@ -710,7 +714,7 @@ var fm = fm || {};
    * @param {Array} input ArrayBuffer.
    */
   fm.ab2str = function(buf) {
-    return String.fromCharCode.apply(null, new Uint16Array(buf));
+    return String.fromCharCode.apply(null, new Uint8Array(buf)); // 1 byte for each char
   }
 
   /**
@@ -719,8 +723,8 @@ var fm = fm || {};
    * @param {String} input string.
    */
   fm.str2ab = function(str) {
-    var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
-    var bufView = new Uint16Array(buf);
+    var buf = new ArrayBuffer(str.length); // 1 byte for each char
+    var bufView = new Uint8Array(buf);
 
     for (var i=0, strLen=str.length; i &lt; strLen; i++) {
       bufView[i] = str.charCodeAt(i);
