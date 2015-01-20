@@ -415,6 +415,7 @@ var fm = fm || {};
 
       function findEntry(rootResp, entries) {
         var findRequest;
+
         // list entry with name entry[0] if it exists. The search request depends
         // on whether we are at the filename entry or at an ancestor folder
         if (entries.length == 1) {
@@ -430,21 +431,34 @@ var fm = fm || {};
         }
 
         findRequest.execute(function(findResp) {
-          // if entry not found
+
           if (findResp.items.length==0) {
+
             console.log('File not found!');
             if (callback) {
               callback(null);
             }
+
           } else {
+
+            // Entry was found! Check if there are more entries
             entries = entries.slice(1);
             if (entries.length) {
-              // recursively move to subsequent entry
+              // Recursively move to subsequent entry
               findEntry(findResp.items[0], entries);
             } else if (callback) {
-              callback(findResp.items[0]);
+              // No more entries, current entry is the file
+              // Request file response object (resource)
+              var request = gapi.client.drive.files.get({
+                'fileId': findResp.items[0].id
+              });
+              request.execute(function(resp) {
+                callback(resp);
+              });
             }
+
           }
+
         });
 
       }
@@ -467,23 +481,93 @@ var fm = fm || {};
   }
 
   /**
-   * Read a file from GDrive cloud
+   * Read a file from the GDrive cloud
    *
-   * @param {String} file's url.
+   * @param {String} file's path.
+   * @param {Function} callback whose argument is the file data if the file is
+   * successfuly read or null otherwise.
    */
-  fm.GDriveFileManager.prototype.readFile = function(url) {}
+  fm.GDriveFileManager.prototype.readFile = function(filePath, callback) {
+
+    this.isfile(filePath, function (fileResp) {
+
+      if (fileResp) {
+        var accessToken = gapi.auth.getToken().access_token;
+        var xhr = new XMLHttpRequest();
+
+        xhr.open('GET', fileResp.downloadUrl);
+        xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+
+        // Response handlers.
+        xhr.onload = function() {
+          callback(xhr.responseText);
+        };
+
+        xhr.onerror = function() {
+            console.log('Could not read file: ' + fileResp.title + ' with id: ' + fileResp.id);
+        };
+
+        xhr.send();
+
+      } else if (callback) {
+        callback(null);
+      }
+
+    });
+
+  }
+
+  /**
+   * Given a file id read the file from the GDrive cloud if authorized. Can read
+   * a file from another user's GDrive if read permission has been granted to the
+   * current user.
+   *
+   * @param {String} file's id.
+   * @param {Function} callback whose argument is the file data if the file is
+   * successfuly read or null otherwise.
+   */
+  fm.GDriveFileManager.prototype.readFileByID = function(fileID, callback) {
+    var self = this;
+
+    function downloadFile() {
+
+      var copyRequest = gapi.client.drive.files.copy({
+        'fileId': fileID,
+        'resource': {'title': 'tempGDriveFile.tmp'}
+      });
+
+      copyRequest.execute(function(copyResp) {
+        self.readFile('tempGDriveFile.tmp', function (dataResp) {
+          callback(dataResp);
+          // Permanently delete the temporal file, skipping the trash.
+          var delRequest = gapi.client.drive.files.delete({
+            'fileId': copyResp.id
+          });
+          delRequest.execute(function(delResp) { console.log(delResp);});
+        });
+      });
+
+    }
+
+    if (this.driveAPILoaded) {
+      downloadFile();
+    } else {
+      this.requestFileSystem(downloadFile);
+    }
+
+  }
 
   /**
    * Write a file to GDrive
    *
    * @param {String} file's path.
    * @param {Array} ArrayBuffer object containing the file data.
-   * @param {Function} optional callback whose argument is the response object.
+   * @param {Function} optional callback whose argument is the file response object.
    */
   fm.GDriveFileManager.prototype.writeFile = function(filePath, fileData, callback) {
 
     // callback to insert new file.
-    function writeFile() {
+    function writeFile(baseDirResp) {
 
       const boundary = '-------314159265358979323846';
       const delimiter = "\r\n--" + boundary + "\r\n";
@@ -493,7 +577,8 @@ var fm = fm || {};
       var name = fileData.name || url.substring(url.lastIndexOf('/') + 1);
       var metadata = {
         'title': name,
-        'mimeType': contentType
+        'mimeType': contentType,
+        'parents': [{'id': baseDirResp.id}]
       };
 
       var base64Data = btoa(fm.ab2str(fileData));
@@ -529,6 +614,29 @@ var fm = fm || {};
     this.createPath(basedir, writeFile);
   }
 
+  /**
+   * Share a file in current users's GDrive with another GDrive user identified
+   * by it's email address.
+   *
+   * @param {String} file's path.
+   * @param {Function} optional callback whose argument is the shared file
+   * response object if found or null otherwise.
+   */
+  fm.GDriveFileManager.prototype.shareFile = function(filePath, userMail, callback) {
+
+    this.isfile(filePath, function (fileResp) {
+      if (fileResp) {
+        var request = gapi.client.drive.permissions.insert({
+          'fileId': fileResp.id,
+          'resource': {'value': userMail, 'type': 'user', 'role': 'reader'}
+          });
+        request.execute(function(resp) {if (callback) {callback(resp);}});
+      } else if (callback) {
+        callback(null);
+      }
+    });
+
+  }
 
   /**
    * Concrete class implementing a file manager for Dropbox.
