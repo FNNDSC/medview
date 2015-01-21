@@ -281,6 +281,8 @@ var fm = fm || {};
     this.SCOPES = 'https://www.googleapis.com/auth/drive.file';
     // Has Google Drive API been loaded?
     this.driveAPILoaded = false;
+    // Current user information (name, email)
+    this.userInfo = null;
 
   }
 
@@ -434,7 +436,7 @@ var fm = fm || {};
 
           if (findResp.items.length==0) {
 
-            console.log('File not found!');
+            console.log('File ' + filePath + ' not found!');
             if (callback) {
               callback(null);
             }
@@ -489,7 +491,7 @@ var fm = fm || {};
    */
   fm.GDriveFileManager.prototype.readFile = function(filePath, callback) {
 
-    this.isfile(filePath, function (fileResp) {
+    this.isfile(filePath, function(fileResp) {
 
       if (fileResp) {
         var accessToken = gapi.auth.getToken().access_token;
@@ -507,11 +509,12 @@ var fm = fm || {};
 
         xhr.onerror = function() {
             console.log('Could not read file: ' + fileResp.title + ' with id: ' + fileResp.id);
+            callback(null);
         };
 
         xhr.send();
 
-      } else if (callback) {
+      } else {
         callback(null);
       }
 
@@ -539,14 +542,17 @@ var fm = fm || {};
       });
 
       copyRequest.execute(function(copyResp) {
+
         self.readFile('tempGDriveFile.tmp', function (dataResp) {
-          callback(dataResp);
           // Permanently delete the temporal file, skipping the trash.
           var delRequest = gapi.client.drive.files.delete({
             'fileId': copyResp.id
           });
           delRequest.execute(function(delResp) { console.log(delResp);});
+
+          callback(dataResp);
         });
+
       });
 
     }
@@ -627,6 +633,7 @@ var fm = fm || {};
   fm.GDriveFileManager.prototype.shareFile = function(filePath, userMail, callback) {
 
     this.isfile(filePath, function (fileResp) {
+
       if (fileResp) {
         var request = gapi.client.drive.permissions.insert({
           'fileId': fileResp.id,
@@ -636,7 +643,30 @@ var fm = fm || {};
       } else if (callback) {
         callback(null);
       }
+
     });
+
+  }
+
+  /**
+   * Get information about current GDrive user.
+   *
+   * @param {Function} optional callback whose argument an object with the user
+   * info (properties: name, emailAddress).
+   */
+  fm.GDriveFileManager.prototype.getUserInfo = function(callback) {
+    var self = this;
+
+    if (this.userInfo) {
+      callback(this.userInfo);
+    } else {
+      var request = gapi.client.drive.about.get();
+      request.execute(function(resp) {
+        var userDataObj = {name: resp.name, emailAddress: resp.user.emailAddress};
+        self.userInfo = userDataObj;
+        callback(userDataObj);
+      });
+    }
 
   }
 
