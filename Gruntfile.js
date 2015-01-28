@@ -11,6 +11,9 @@ module.exports = function(grunt) {
       '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
       ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n',
     srcFiles: ['src/main.js, src/viewer/js/*.js'],
+    components: ['src/viewer/components/jquery/dist/jquery.min.js', 'src/viewer/components/jquery-ui/jquery-ui.min.js',
+      'src/viewer/components/requirejs/require.js'],
+    lib: ['src/viewer/lib/*.js', 'src/viewer/lib/fancytree/jquery.fancytree.min.js']
     // Task configuration.
     jshint: {
       options: {
@@ -53,7 +56,7 @@ module.exports = function(grunt) {
         stripBanners: true
       },
       dist: {
-        src: '<%= jshint.source.src %>',,
+        src: ['<%= jshint.source.src %>', '<%= components %>', '<%= lib %>'],
         dest: 'dist/<%= pkg.name %>.js'
       }
     },
