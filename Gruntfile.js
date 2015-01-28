@@ -13,7 +13,7 @@ module.exports = function(grunt) {
     srcFiles: ['src/main.js, src/viewer/js/*.js'],
     components: ['src/viewer/components/jquery/dist/jquery.min.js', 'src/viewer/components/jquery-ui/jquery-ui.min.js',
       'src/viewer/components/requirejs/require.js'],
-    lib: ['src/viewer/lib/*.js', 'src/viewer/lib/fancytree/jquery.fancytree.min.js']
+    lib: ['src/viewer/lib/*.js', 'src/viewer/lib/fancytree/jquery.fancytree.min.js'],
     // Task configuration.
     jshint: {
       options: {
