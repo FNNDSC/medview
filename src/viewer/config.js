@@ -3,12 +3,11 @@ require.config({
     paths: {
         // the left side is the module ID,
         // the right side is the path to
-        // the jQuery file, relative to baseUrl.
+        // the file, relative to baseUrl.
         // Also, the path should NOT include
         // the '.js' file extension. This example
-        // is using jQuery located at
-        // lib/jquery.min.js, relative to
-        // the baseUrl.
+        // is using JS files located at
+        // lib/jquery.min.js, relative to the baseUrl.
         jquery: 'lib/jquery.min',
         jquery_ui: 'lib/jquery-ui-1.8.23.custom.min',
         dicomParser: 'lib/dicomParser.min',
@@ -32,7 +31,7 @@ require(['jquery', 'jquery_ui', 'fm'], function() {
 
         // Put the path to your script (the one who instantiates a viewer object)
         // relative to the viewer folder here
-        '../app.js'
+        '../main.js'
 
         ]);
     });

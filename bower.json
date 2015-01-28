@@ -1,0 +1,28 @@
+{
+  "name": "mi2b2",
+  "version": "0.1.0",
+  "homepage": "https://github.com/FNNDSC/mi2b2",
+  "authors": [
+    "Jorge <jbernal0019@yahoo.es>"
+  ],
+  "description": "Medical image viewer",
+  "keywords": [
+    "DICOM",
+    "mi2b2",
+    "medical",
+    "imaging"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "src/components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery-ui": "~1.11.2",
+    "jquery": "~2.1.3"
+  }
+}
