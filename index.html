@@ -1,0 +1,91 @@
+<!DOCTYPE html >
+<html>
+  <head>
+  	<meta charset="utf-8" >
+    <title>MRI data visualizer: mi2b2</title>
+    <!-- Include font awesome style -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <!--Include jquery ui styles -->
+    <link rel="stylesheet"  href="js/components/jquery-ui/themes/smoothness/jquery-ui.min.css">
+    <link rel="stylesheet" href="styles/mi2b2.css">
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
+  </head>
+
+  <body>
+
+    <div id="tabs">
+
+      <ul>
+        <li><a href="#tabload">Load files</a></li>
+      </ul>
+
+      <div id="tabload">
+
+        <div id="inputcontainer">
+          <div class="title center">
+            Welcome to MedView
+          </div>
+
+        <br/>  
+
+	<div class="big center">
+	<p>
+	Click or drag-n-drop!
+	</p>
+	</div>
+
+          <!-- Drop files (or click) -->
+          <div id="directoryselection">
+            <label for="dirbtn" class="directory-btn">
+              <i class="fa fa-download fa-2x"></i>
+            </label>
+            <input id="dirbtn" type="file" style="display: none;" webkitdirectory="" mozdirectory="" directory="" multiple>
+          </div>
+
+
+	<div class="small center"> 
+	<p>
+	Drag folders (Chrome) </p><p> <i class="fa fa-folder fa-1x"></i> <i class="fa fa-long-arrow-right fa-1x"></i> <i class="fa fa-chrome fa-1x"></i>
+	</p>
+	<p>
+	Drag multiple files (other browsers)</p><p> <i class="fa fa-file fa-1x"></i> <i class="fa fa-file fa-1x"></i>  <i class="fa fa-ellipsis-h fa-1x"></i>  <i class="fa fa-file fa-1x"></i> <i class="fa fa-long-arrow-right fa-1x"></i> <i class="fa fa-firefox fa-1x"></i> <i class="fa fa-safari fa-1x"></i> <i class="fa fa-edge fa-1x"></i>
+	</p>
+	<p>
+	<b>Data always stays on your computer!</b>
+	</p>
+
+	</div>
+
+	<br/>
+
+          <div class="collab">
+            <button id="collabbutton" type="button" class="custom-button">Join collaboration</button>
+            <div class="collab-input">
+              <label for="roomId">Room #</label>
+              <input id="roomId" type="text">
+              <button id="gobutton" type="button" class="custom-button">Go!</button>
+            </div>
+          </div>
+        </div>
+    <br/>    
+        <div class="footbar">
+          <br/>
+          <b>Copyright &copy; 2015  </b><br><br>
+          <a href="http://childrenshospital.org/FNNDSC" style="text-decoration: none">Boston Children's Hospital</a>
+          <div class="README">
+          <button id="READMEbutton" type="button" class="custom-button"><i class="fa fa-github"></i> Read more</button>
+          </div> <br><br>
+          <a href="http://www.partners.org/" style="text-decoration: none">Partners Healthcare</a>
+
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Load viewer scripts -->
+    <script data-main="main" src="js/components/requirejs/require.js"></script>
+
+  </body>
+</html>
