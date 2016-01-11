@@ -1,19 +1,19 @@
 {
-  "name": "mi2b2",
+  "name": "medview",
   "version": "0.1.0",
   "description": "Medical image viewer",
   "keywords": [
     "DICOM",
-    "mi2b2",
+    "medview",
     "medical",
     "imaging"
   ],
   "author": "Jorge Bernal Rusiel ",
-  "homepage": "https://github.com/FNNDSC/mi2b2",
+  "homepage": "https://github.com/FNNDSC/medview",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/FNNDSC/mi2b2.git"
+    "url": "https://github.com/FNNDSC/medview.git"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -25,9 +25,10 @@
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-browser-sync": "^2.2.0",
+    "grunt-gh-pages": "1.0.0",
     "grunt-contrib-copy": "^0.7.0",
     "grunt-contrib-cssmin": "^0.14.0",
-    "grunt-contrib-jasmine": "^0.8.2",
+    "grunt-contrib-jasmine": "^0.9.2",
     "grunt-contrib-jshint": "^0.11.0",
     "grunt-contrib-requirejs": "^0.4.4",
     "grunt-contrib-uglify": "^0.9.2",

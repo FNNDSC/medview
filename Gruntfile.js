@@ -158,6 +158,13 @@ module.exports = function(grunt) {
         }
     },
 
+    'gh-pages': {
+      options: {
+        base: 'dist'
+      },
+      src: ['**/*']
+    }
+
   });
 
   // These plugins provide necessary tasks.
@@ -169,6 +176,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-browser-sync');
+  grunt.loadNpmTasks('grunt-gh-pages');
   grunt.loadNpmTasks('grunt-contrib-requirejs');
 
   // Serve task.

@@ -8,7 +8,7 @@ require.config({
     // back to the local jQuery at jquery/dist/jquery.min.js relative to the baseUrl.
     //
     // All JS modules are needed in development mode. However the only modules needed after
-    // building the app are jquery, jquery_ui and mi2b2.
+    // building the app are jquery, jquery_ui and medview.
     jquery: ['https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min', 'jquery/dist/jquery.min'],
     jquery_ui: ['https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min', 'jquery-ui/jquery-ui.min'],
     gapi: 'https://apis.google.com/js/api',
@@ -25,15 +25,15 @@ require.config({
     chatjs: 'chatjs/src/js/chatjs',
     jqdlgext: 'chatjs/src/js/lib/jquery.dialogextend',
     viewerjs: 'viewerjs/src/js/viewerjs',
-    mi2b2: '../mi2b2'
+    medview: '../medview'
   }
 });
 
 
-require(['mi2b2'], function(mi2b2) {
+require(['medview'], function(medview) {
 
   // Entry point
-  var app = new mi2b2.App();
+  var app = new medview.App();
 
   app.init();
 });
