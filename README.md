@@ -2,7 +2,7 @@
 
 [![Join the chat at https://gitter.im/FNNDSC/medview](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/FNNDSC/medview?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-The Mi2b2 Viewer is a distributed collaborative neuroimage visualization application that is
+Medview viewer is a distributed collaborative neuroimage visualization application that is
 delivered to the users over the web without requiring the installation of any additional software
 or browser plugging. This not only enhances accessibility and usability for the end-users but
 automatically provides them with the latest application updates without requiring any technological
@@ -26,9 +26,9 @@ locally.
 Please take a look at the [viewerjs.Viewer's wiki](https://github.com/FNNDSC/viewerjs/wiki) to learn how
 to interact with the embedded VObj through peripheral device controls.
 
-A stable version of the web application is available here: <http://medview.babymri.org>. 
+A stable version of the web application is available here: <http://medview.babymri.org>.
 
-A dev version the web application is available here: <http://fnndsc.github.io/medview/>. 
+A dev version the web application is available here: <http://fnndsc.github.io/medview/>.
 
 Note that in some cases both of these versions might be identical; however the dev version will typically change first before that is rolled out to stable.
 

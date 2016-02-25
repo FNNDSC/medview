@@ -1,11 +1,11 @@
 {
-  "name": "mi2b2",
+  "name": "medview",
   "version": "0.1.0",
   "homepage": "https://github.com/FNNDSC/medview",
   "authors": [
     "Jorge <jbernal0019@yahoo.es>"
   ],
-  "description": "Medical image viewer",
+  "description": "Stand alone web-based medical image viewer",
   "keywords": [
     "DICOM",
     "medview",
@@ -22,6 +22,7 @@
     "tests"
   ],
   "dependencies": {
-    "viewerjs": "https://github.com/FNNDSC/viewerjs.git#master"
+    "viewerjs": "FNNDSC/viewerjs#master",
+    "text": "~2.0.14"
   }
 }

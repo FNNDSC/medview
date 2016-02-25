@@ -1,7 +1,11 @@
 /*================================================== Global Rules ================================================== */
 body{
-  margin: 0;
   font-family: 'Droid Sans', sans-serif;
+}
+
+html, body{
+  height:100%;
+  margin: 0;
 }
 
 div, button {
@@ -23,205 +27,121 @@ div, button {
   cursor: pointer;
 }
 
-/*================================================== TABS ================================================== */
-/*tabs*/
-/*Widget background*/
-.ui-widget-content{
-  padding: 0;
-}
-.ui-tabs .ui-tabs-panel{
-  padding: 0;
-  background-color: #CFD8DC;
-}
-
-/*close icon within tabs*/
-div#tabs li .ui-icon-close{
-  float: left;
-  margin: 0.2em 0.2em 0 0;
-  cursor: pointer;
-}
-
-.ui-corner-all{
-   border-radius: 0px !important;
-}
-
-.ui-widget-header{
-  border:none !important;
-  background: none !important;
-  background-color: #F9F9F9 !important;
-  font-weight:normal!important;
-}
-
-.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active{
-  background: none !important;
-  background-color: #607D8B !important;
-}
-
-.ui-state-active > a, .ui-widget-content .ui-state-active > a, .ui-widget-header .ui-state-active > a{
-  color: #F9F9F9 !important;
-}
-
-/*div containers within tabs*/
-/*=============================================== Main containers ============================================== */
-/*main page container*/
-div#inputcontainer{
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  height: -webkit-calc(100vh - 135px);
-  height: -moz-calc(100vh - 135px);
-  height: calc(100vh - 135px);
-  overflow: auto;
-  margin: 0;
-}
-
-/*viewer containers*/
-div.viewer-container{
-  position: relative;
-  background-color: #607D8B;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  height: -webkit-calc(100vh - 3.2em);
-  height: -moz-calc(100vh - 3.2em);
-  height: calc(100vh - 3.2em);
-  overflow: hidden;
-  margin: 0;
-}
-
-
-
-/*================================================== Collaboration ================================================== */
 /*collaboration section*/
 .collab{
-  margin: auto;
-  text-align: center;
+  position: relative;
+  z-index: 9999;
 }
 
 .collab-input{
   display: none;
-  border: none!important;
-  padding: 10px!important;
-  background-color: #0091EA;
-  color: #F9F9F9;
-  font-size: 18px;
+  border: 1px solid;
+  margin-top: 2px;
+  padding: 2px;
+  background-color: #DDD;
+  width: 230px;
 }
 
 #gobutton{
-  display: inline-block;
-  font-size: 18px;
-  background-color: #0091EA;
-  color:#F9F9F9;
-}
-
-#roomId{
-  border:none !important;
-  padding: 0 !important;
-}
-
-#gobutton:hover{
-  color: #0091EA;
-  background-color:#F9F9F9;
-}
-
-/*================================================== Titles ================================================== */
-/*Title goes here*/
-.title{
-  color: #F9F9F9;
-  background-color: #607D8B;
-  font-size: 30px;
-  padding: 40px;
-  font-weight: normal;
-  vertical-align: middle;
-  line-height: 1em;
-}
-
-.title b{
-  color: #40C4FF;
-}
-
-/*Second piece of text goes here*/
-.big{
-  color: #212121;
-  font-size: 30px;
-  padding: 40px 0px 20px 0px;
-  font-weight: lighter;
-  line-height: 1em;
-}
-
-/*Second piece of text goes here*/
-.small {
-  color: #757575;
-  font-size: 18px;
-  font-weight: normal;
-  padding-bottom:20px;
-}
-
-/*================================================== BUTTON ================================================== */
-/*div containing slicedrop image and upload button*/
-div#directoryselection{
-  padding: 20px 40px;
-  width: 100%;
-  margin: 0 auto;
-  overflow: auto;
-}
-
-/*directory upload button*/
-.directory-btn{
   display: block;
-  padding: 60px;
-  width: 200px;
-  height: 200px;
-  background-color: #0091EA;
-  border: 5px solid #0091EA;
-  color: #F9F9F9;
-  font-size: 30px;
-  text-align: center;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  border-radius: 50%;
-  cursor: pointer;
-  margin:auto;
+  margin: 2px auto 0;
 }
 
-.directory-btn:hover, .dragged{
-  background-color: #F9F9F9;
-  border: 5px dashed #0091EA;
-  color: #0091EA;
+div#directoryselection{
+  position: relative;
+  margin-top: 10px;
 }
 
-#collabbutton{
-  background-color: #F9F9F9;
-  color: #0091EA;
-  font-size: 18px;
-}
-/*================================================== README ================================================== */
-/*Second piece of text goes here*/
-
-#READMEbutton{
-  float: right;
-  background-color: #757575;
-  color: #F9F9F9;
-  font-size: 18px;
+div#inputcontainer{
+  position: relative;
+  top: 5px;
+  left: 2px;
+  margin-bottom: 5px;
 }
 
-/*================================================== Footbar ================================================== */
-/*footbar*/
-.footbar {
-  position: fixed;
-  color: #212121;
-  background-color: #B0BEC5;
-  width: 100%;
-  padding: 5px 20px;
-  text-align:left;
-  vertical-align: middle;
-  line-height: 0.7em;
-  font-size: 14px;
-  bottom: 0;
-  left: 0;
-  right: 0;
+div#viewercontainer{
+  background-color: #353535;
+  border: 6px solid #353535;
+  height: 100%;
   margin: 0;
+}
+
+div.view-renderer-titlebar{
+  border-radius: 0;
+  background: #f9f9f9;
+}
+
+.modal {
+  width: 50%;
+  height: auto;
+  margin: auto;
+  padding: 100px;
+  background-color: rgba(0, 0, 0, 0.5);
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:1000;
+  display:none;
+}
+
+.modalDialog {
+  min-height: 300px;
+  min-width:500px;
+  background-color: #f9f9f9;
+}
+
+.view-trash{
+  position: absolute;
+  z-index: 9998;
+  top: 0;
+  left: calc(50% - 100px);
+  width: 200px;
+  height: 90px;
+  opacity: 0.96;
+  background-color: #0091EA;
+  color: #f9f9f9;
+  display: none;
+  border: 4px solid #f9f9f9;
+  text-align: center;
+  font-size: 72px;
+}
+
+.view-trash.highlight{
+  border: 4px dashed #F9F9F9;
+  background-color: #D50000;
+}
+
+.view-trash-sortable{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.library .section {
+  text-align: center;
+  padding:10px;
+  border: 2px solid #607D8B;
+  background-color: #607D8B;
+}
+
+.library .section:hover {
+  background-color: #0091EA;
+  border: 2px solid #FFF;
+  cursor: pointer;
+}
+
+.library .section .title {
+  font-size: 25px;
+}
+
+.library .section .thumbnail {
+  display: inline-block;
+  height: 100px;
+  width: 100px;
+  border: 1px solid black;
+  background-size: contain;
 }
