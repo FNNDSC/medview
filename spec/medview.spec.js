@@ -26,17 +26,19 @@ define(['medview'], function(medview) {
       app.destroy();
     });
 
-    it('medview.appendAll appends a new volume file obj',
+    it('medview.init starts a viewer with a renderers box',
 
       function() {
 
-        app.appendAll(
-          'http://www.googledrive.com/host/0B8u7h0aKnydhd0xHX2h0NENsbEE/w0to1.nii'
-        );
+        expect(app.view.rBox).not.toBeNull();
+      }
+    );
 
-        expect(app.imgFileArr[0]).toEqual({
-            url: 'http://www.googledrive.com/host/0B8u7h0aKnydhd0xHX2h0NENsbEE/w0to1.nii.gz'
-          });
+    it('medview.init starts a viewer with a toolbar',
+
+      function() {
+
+        expect(app.view.toolbar).not.toBeNull();
       }
     );
 

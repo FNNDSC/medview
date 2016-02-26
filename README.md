@@ -8,29 +8,21 @@ or browser plugging. This not only enhances accessibility and usability for the 
 automatically provides them with the latest application updates without requiring any technological
 skills or administrator-level access to their computing devices.
 
-The viewer presents a simple tab-based interface that let users drag and drop multiple neuroimage files
-(even folders in the case of the Chrome browser) in the content space of the main "Load files" tab for
-their quick visualization in a second newly created tab that immediately becomes active. The user can
-repeatedly switch back to the main tab and load more files that will be visualized in subsequent newly
-created tabs. Each tab has an independent [viewerjs.Viewer](https://github.com/FNNDSC/viewerjs)
-visualization object (VObj) embedded and all of them are attached to the same single HTML page. An
-existing tab can then be closed by clicking its cross icon which automatically destroys the corresponding
-VObj and removes from the page all the HTML elements associated with the tab.
+The viewer can read a directory tree (chrome) or multiple neuroimage files in the same
+directory (other browsers) for their visualization and collaboration through the embedded
+[viewerjs.Viewer](https://github.com/FNNDSC/viewerjs) visualization object (VObj).
+Alternatively users can directly drag in and drop files/folders onto the viewer.
 
-The user can start a realtime collaboration session from any of the visualization tabs as the collaboration owner. He/She can also joint to an existing collaboration session by pressing the "Enter existing collab
-room" button, entering the session id in the "room id" input and then clicking the "Go!" button. The Google’s
-login and authorization windows will then pop up and after successful completion a new visualization tab is
-created as before. However in this case the neuroimage data are remotely accessed from GDrive rather than
-locally.
+Users can start a real-time collaboration session as the collaboration owner or alternatively
+joint to an existing collaboration session by clicking the "Start collaboration" button. The
+Google’s login and/or authorization windows will then pop up and after successful completion
+they will be able to share visualization and collaborate in real-time.
 
-Please take a look at the [viewerjs.Viewer's wiki](https://github.com/FNNDSC/viewerjs/wiki) to learn how
-to interact with the embedded VObj through peripheral device controls.
+Please take a look at the [viewerjs.Viewer's wiki](https://github.com/FNNDSC/viewerjs/wiki) to
+learn how to interact with the embedded VObj through peripheral device controls.
 
-A stable version of the web application is available here: <http://medview.babymri.org>.
+A live version the web application is available here: <http://fnndsc.github.io/medview/>.
 
-A dev version the web application is available here: <http://fnndsc.github.io/medview/>.
-
-Note that in some cases both of these versions might be identical; however the dev version will typically change first before that is rolled out to stable.
 
 ## Build
 This project uses grunt.
