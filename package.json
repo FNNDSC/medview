@@ -8,12 +8,12 @@
     "medical",
     "imaging"
   ],
-  "author": "Jorge Bernal Rusiel ",
+  "author": "Jorge Bernal Rusiel",
   "homepage": "https://github.com/FNNDSC/medview",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/FNNDSC/medview.git"
+    "url": "git+https://github.com/FNNDSC/medview.git"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -23,20 +23,24 @@
     "node": ">= 5.4"
   },
   "devDependencies": {
-    "grunt": "^0.4.5",
+    "grunt": "^1.4.1",
     "grunt-browser-sync": "^2.2.0",
+    "grunt-contrib-clean": "^0.7.0",
     "grunt-contrib-connect": "^0.11.2",
     "grunt-contrib-copy": "^0.8.2",
-    "grunt-contrib-cssmin": "^0.14.0",
-    "grunt-contrib-htmlmin": "^0.6.0",
-    "grunt-contrib-jasmine": "^1.0.0",
+    "grunt-contrib-cssmin": "^4.0.0",
+    "grunt-contrib-htmlmin": "^3.1.0",
+    "grunt-contrib-jasmine": "^3.0.0",
     "grunt-contrib-jshint": "^0.12.0",
     "grunt-contrib-requirejs": "^0.4",
-    "grunt-contrib-uglify": "^0.9.2",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-contrib-clean" : "^0.7.0",
+    "grunt-contrib-uglify": "^5.0.1",
+    "grunt-contrib-watch": "^1.1.0",
     "grunt-jscs": "^2.7.0",
     "grunt-processhtml": "^0.3.8",
     "grunt-template-jasmine-requirejs": "^0.2.3"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/FNNDSC/medview/issues"
+  },
+  "main": "Gruntfile.js"
 }

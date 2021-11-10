@@ -60,31 +60,13 @@ module.exports = function(grunt) {
       }
     },
 
-    jasmine: { // run tests, source files are first copied within componentsDir
-      test: {
-        options: {
-          host: 'http://<%= connect.test.options.hostname %>:<%= connect.test.options.port %>/',
-          src: '<%= componentsDir %>/<%= pkg.name %>/src/js/*.js',
-          specs: '<%= jshint.test.src %>',
-          template: require('grunt-template-jasmine-requirejs'),
-          templateOptions: {
-            version: '<%= componentsDir %>/requirejs/require.js',
-            requireConfigFile: 'src/config.js', // requireJS's config file
-            /*requireConfig: {
-              baseUrl: '.' // change base url to execute tests from local FS
-            }*/
-          }
-        }
-      }
-    },
-
     requirejs: { // concat and minimize AMD modules
       compile: {
         options: {
           baseUrl: '<%= componentsDir %>',
           paths: {
             jquery: 'empty:', // does not include jquery in the output
-            jquery_ui: 'empty:', // does not include jquery_ui in the output
+            jqueryUi: 'empty:', // does not include jquery_ui in the output
           },
           name: '<%= pkg.name %>',
           mainConfigFile: 'src/config.js',
@@ -235,7 +217,7 @@ module.exports = function(grunt) {
   });
 
   // Test task.
-  grunt.registerTask('test', ['jscs', 'jshint', 'copy:module', 'connect', 'jasmine']);
+  grunt.registerTask('test', ['jscs', 'jshint', 'copy:module', 'connect']);
 
   // Build task.
   grunt.registerTask('build', [

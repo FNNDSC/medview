@@ -1,9 +1,9 @@
 require.config({
   baseUrl: '.',
   paths: {
-    jquery: ['https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min',
+    jquery: ['https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min',
       'libs/jquery/dist/jquery.min'],
-    jquery_ui: ['https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min',
+    jqueryUi: ['https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js',
       'libs/jquery-ui/jquery-ui.min'],
     medview: 'js/medview.min'
   }
