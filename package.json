@@ -1,46 +1,19 @@
 {
   "name": "medview",
-  "version": "0.1.0",
-  "description": "Stand alone web-based medical image viewer",
-  "keywords": [
-    "DICOM",
-    "medview",
-    "medical",
-    "imaging"
-  ],
-  "author": "Jorge Bernal Rusiel",
-  "homepage": "https://github.com/FNNDSC/medview",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/FNNDSC/medview.git"
-  },
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "parcel index.html",
+    "build": "parcel build index.html"
   },
-  "dependencies": {},
-  "engines": {
-    "node": ">= 5.4"
+  "author": "Sandip <sandipsamal117@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "chris-upload": "^1.4.0"
   },
   "devDependencies": {
-    "grunt": "^1.4.1",
-    "grunt-browser-sync": "^2.2.0",
-    "grunt-contrib-clean": "^0.7.0",
-    "grunt-contrib-connect": "^0.11.2",
-    "grunt-contrib-copy": "^0.8.2",
-    "grunt-contrib-cssmin": "^4.0.0",
-    "grunt-contrib-htmlmin": "^3.1.0",
-    "grunt-contrib-jasmine": "^3.0.0",
-    "grunt-contrib-jshint": "^0.12.0",
-    "grunt-contrib-requirejs": "^0.4",
-    "grunt-contrib-uglify": "^5.0.1",
-    "grunt-contrib-watch": "^1.1.0",
-    "grunt-jscs": "^2.7.0",
-    "grunt-processhtml": "^0.3.8",
-    "grunt-template-jasmine-requirejs": "^0.2.3"
-  },
-  "bugs": {
-    "url": "https://github.com/FNNDSC/medview/issues"
-  },
-  "main": "Gruntfile.js"
+    "parcel-bundler": "^1.12.5"
+  }
 }

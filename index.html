@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+  <title>Medview</title>
+  <style>
+    div#viewer{
+        background-color: #353535;
+        border: 6px solid #353535;
+        height: 90vh;
+        margin: 0;
+      }
+  </style>
+</head>
+<body>
+<div class="w3-container">
+  <h2>Medview <label id="lblUser" class='w3-cursive w3-display-topright w3-text-blue'></label></h2>
+
+
+  <div class="w3-bar w3-blue">
+    <button class="w3-bar-item w3-button" id = "myFiles">My Files</button>
+    <div class="w3-bar-item w3-button"><input type='file' id='upload' multiple></input></div>
+    <div class="w3-dropdown-hover">
+      <button class="w3-button">Orientation</button>
+      <div class="w3-dropdown-content w3-bar-block w3-border">
+        <div class="w3-bar-item w3-button" id='x'>X</div>
+        <div class="w3-bar-item w3-button" id='y'>Y</div>
+        <div class="w3-bar-item w3-button" id='z'>Z</div>
+      </div>
+      
+    </div>
+    <div class="w3-dropdown-hover">
+      <button class="w3-button">Collaborate</button>
+      <div class="w3-dropdown-content w3-bar-block w3-border">
+        <div class="w3-bar-item w3-button" id='submit'>Generate Token</div>
+        <div class="w3-bar-item w3-button tablink"  onclick="openLink(event, 'Share')">Share</div>
+        <div class="w3-bar-item w3-button tablink"  onclick="openLink(event, 'Join')">Join</div>
+      </div>
+      
+    </div>
+    
+    <div onclick="document.getElementById('id01').style.display='block'" class="w3-bar-item w3-button w3-right">Login</div>
+
+  </div>
+  <div id="viewer">
+    <div id="Join" class="w3-container city w3-animate-left w3-white" style="display:none">
+<span onclick="this.parentElement.style.display='none'"
+  class="w3-button w3-large w3-display-topright">&times;</span>
+Collaboration id: <input type="text" id="txtCollab" class="w3-input"></input>
+<button id='download' class='w3-button w3-blue'>join</button>
+</div>
+<div id="Share" class="w3-container city w3-animate-left w3-white" style="display:none">
+ <span onclick="this.parentElement.style.display='none'"
+  class="w3-button w3-large w3-display-topright">&times;</span> 
+Share with : <input type='text' id='txtShareUser' class="w3-input"></input>
+Collaboration id : <input type='text' id='txtShareCollab' class="w3-input"></input>
+<button id='share' class='w3-button w3-blue'>share</button>
+</div>
+
+  <!-- Sidebar -->
+<div class="w3-sidebar w3-bar-block w3-border-right w3-white" style="display:none" id="mySidebar">
+  <button onclick="w3_close()" class="w3-bar-item w3-large">Close &times;</button>
+  <div class="w3-bar-item" id="myUploaded">
+  <button  class="w3-bar-item w3-large w3-blue">Uploaded</button>
+  </div>
+  <div class="w3-bar-item" id="myShared">
+  <button  class="w3-bar-item w3-large w3-green">Shared </button>
+  </div>
+
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+ <div id="id01" class="w3-modal">
+    <div class="w3-modal-content w3-card-4 w3-animate-zoom" style="max-width:600px">
+
+      <div class="w3-center"><br>
+        <span onclick="document.getElementById('id01').style.display='none'" class="w3-button w3-xlarge w3-hover-red w3-display-topright" title="Close Modal">&times;</span>
+
+      </div>
+
+      <div class="w3-container">
+        <div class="w3-section">
+          <label><b>Username</b></label>
+          <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter Username" id="txtUser" required>
+          <label><b>Password</b></label>
+          <input class="w3-input w3-border" type="password" placeholder="Enter Password" id="txtPwd" required>
+          <button class="w3-button w3-block w3-green w3-section w3-padding" id="login">Login</button>
+          <input class="w3-check w3-margin-top" type="checkbox" checked="checked"> Remember me
+        </div>
+      </div>
+
+      <div class="w3-container w3-border-top w3-padding-16 w3-light-grey">
+        <button onclick="document.getElementById('id01').style.display='none'" type="button" class="w3-button w3-red">Cancel</button>
+        <span class="w3-right w3-padding w3-hide-small">Forgot <a href="#">password?</a></span>
+      </div>
+
+    </div>
+  </div>
+
+
+
+
+  <div id = "alert" class="w3-panel w3-display-container">
+  <label id ='msg' class="w3-center"></label>
+  <span onclick="this.parentElement.style.display='none'"
+  class=" w3-display-topright">&times;</span>
+  
+</div>
+  
+
+  <script src="app.js"></script>
+  <script>
+
+
+function w3_close() {
+  document.getElementById("mySidebar").style.display = "none";
+}
+</script>
+<script>
+function openLink(evt, animName) {
+  var i, x, tablinks;
+  x = document.getElementsByClassName("city");
+  for (i = 0; i < x.length; i++) {
+    x[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablink");
+  for (i = 0; i < x.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" w3-red", "");
+  }
+  document.getElementById(animName).style.display = "block";
+  evt.currentTarget.className += " w3-red";
+}
+</script>
+</body>
+</html>
