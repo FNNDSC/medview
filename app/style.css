@@ -1,0 +1,32 @@
+img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+  
+}
+.thumbnail {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+  width: 100px;
+}
+
+
+.cursor {
+    width: 20px;
+    transition: all ease;
+    
+}
+div#viewer{
+        height: 90vh;
+        margin: 0;
+        background-color: #353535;
+        border: 6px solid #353535;
+        overflow: hidden;
+        
+       
+}
+.zoom{  
+ 
+}
