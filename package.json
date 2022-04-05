@@ -1,7 +1,7 @@
 {
   "name": "medview",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "prestart": "cd api && npm install",
     "start":"run-p dev:api dev:server",
@@ -12,12 +12,17 @@
   "author": "Sandip <sandipsamal117@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "chris-upload": "^1.5.4"
+    "express": "^4.17.1",
+    "chris-upload": "^1.5.4",
+    "@fnndsc/chrisapi": "^1.6.1",
+    "viewerjs":  "https://github.com/FNNDSC/viewerjs.git#master"
   },
   "devDependencies": {
+    "@types/express": "^4.17.11",
     "http2-proxy": "^5.0.53",
     "npm-run-all": "^4.1.5",
-    "snowpack": "^3.5.9"
+    "snowpack": "^3.5.9",
+    "nodemon": "^2.0.7"
   },
   "repository": {
     "type": "git",

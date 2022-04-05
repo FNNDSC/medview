@@ -1,11 +1,25 @@
 import cujs from 'chris-upload';
-import collaborate from './index'
-//import 'regenerator-runtime/runtime';
-
+import collaborate from './index';
+import Request from '@fnndsc/chrisapi/src/request';
 
 // Create an object
 var cu = new cujs();
 let feedId;
+
+/**
+ * Private method to download a blob/file/stream from CUBE 
+ *
+ * @param {String} url API endpoint to a particular resource in CUBE
+ * @response {Promise} JS promise, resolves to a string value
+ */
+async function _download(url){
+    var client = await cu.getToken();
+    const req = new Request(client.auth, 'application/octet-stream', 30000000);
+    const blobUrl = url;
+    return req.get(blobUrl).then(resp => resp.data);
+};
+
+
 
 
 const upload = document.getElementById('upload');
@@ -105,10 +119,36 @@ myFiles.onclick = function () {
 upload.onchange = function(){
   var fileNames = [];
   for(var i=0; i<upload.files.length;i++){
-    fileNames.push(upload.files[i].name);
+    fileNames.push(URL.createObjectURL(upload.files[i]));
   }
   createThumbnails(upload.files)
+  viewer.onload(fileNames);
+
 };
+
+viewer.onload = function(fileNames){
+
+  var newView = document.createElement('div');
+  newView.id = "test"
+  viewer.appendChild(newView)
+
+  // create a new 3d renderer
+  var r = new X.renderer2D();
+  r.orientation='X'
+  r.container='test'
+  r.init();
+    
+  // create a mesh from a .vtk file
+  var skull = new X.volume();
+
+  skull.file = fileNames
+    
+  // add the object
+  r.add(skull);
+    
+  // .. and render it
+  r.render();
+}
 
 
 async function createThumbnails(files){
@@ -243,13 +283,23 @@ download.onclick = async function(){
   alert.style.display='block';
   alert.className="w3-orange w3-panel w3-display-container w3-display-topmiddle";
   let fileNames = [];
-  fileNames =  await cu.viewFiles(parseInt(txtCollab.value));
+  fileNames =  await cu.viewFiles(parseInt(txtCollab.value),'saved');
   await delay(2000)
   if(fileNames.length>0){
-
-    msg.textContent = "Joined successfully."+fileNames.length +" files available!";
-    console.log(fileNames)
     collaborate();
+    var files =[];
+    for(var i =0; i<fileNames.length;i++){
+      var resp = await  _download(fileNames[i]);
+      if(resp.type=='application/dicom'){
+        files.push(URL.createObjectURL(resp));
+      }
+
+    }
+
+    viewer.onload(files)
+   
+    msg.textContent = "Joined successfully."+fileNames.length +" files available!";
+    
   }
   else{
     msg.textContent = "Files not available yet. Try again after sometime."

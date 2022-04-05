@@ -54,7 +54,8 @@ async function collaborate () {
             
         cursor.setAttribute("data-sender", sender);
         svgPath.setAttribute('fill', `hsl(${messageBody.color}, 50%, 50%)`); 
-        viewer.appendChild(cursor);
+        console.log(viewer.children)
+        viewer.children[4].appendChild(cursor);
 
         return cursor;
     }
